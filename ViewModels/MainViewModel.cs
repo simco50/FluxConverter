@@ -1,5 +1,4 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -12,7 +11,6 @@ using FluxConverterTool.Helpers;
 using FluxConverterTool.PhysX;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
-using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace FluxConverterTool.ViewModels
 {
@@ -20,8 +18,8 @@ namespace FluxConverterTool.ViewModels
     {
         #region VARIABLES
 
-        private PhysXCooker _cooker;
-        private MeshFormatter _formatter;
+        private readonly PhysXCooker _cooker;
+        private readonly MeshFormatter _formatter;
 
         public ObservableCollection<FluxMesh> Meshes { get; set; } = new ObservableCollection<FluxMesh>();
 
