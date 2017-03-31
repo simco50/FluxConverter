@@ -1,0 +1,170 @@
+﻿<controls:MetroWindow
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:FluxConverterTool.ViewModels"
+        xmlns:views="clr-namespace:FluxConverterTool.Views"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"
+        x:Class="FluxConverterTool.Views.MainView"
+        mc:Ignorable="d"
+        Title="MainView" Height="720" Width="1240" Icon="/FluxConverterTool;component/Logo.ico">
+    <Grid>
+        <Grid.DataContext>
+            <viewModels:MainViewModel/>
+        </Grid.DataContext>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row ="0">
+                <DockPanel>
+                    <Menu DockPanel.Dock="Top">
+                        <Menu.Resources>
+                            <Style TargetType="{x:Type Image}">
+                                <Setter Property="Width" Value="18"/>
+                                <Setter Property="Height" Value="18"/>
+                            </Style>
+                        </Menu.Resources>
+                        <MenuItem Header="File">
+                            <MenuItem Header="Help" InputGestureText="F1">
+                                <MenuItem.Icon>
+                                    <Image Source="/FluxConverterTool;component/Resources/Icons/Info.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuItem>
+                    </Menu>
+                </DockPanel>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Meshes" Grid.Row="0">
+                        <ListBox SelectionMode="Extended" x:Name="MeshList" ItemsSource="{Binding Meshes}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <command:EventToCommand Command="{Binding OnSelectionChangedCommand}" CommandParameter="{Binding SelectedItems, ElementName=MeshList}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding Name}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </GroupBox>
+                    <GroupBox Header="Actions" Grid.Row="1">
+                        <StackPanel>
+                            <Button Content="Remove selected" IsEnabled="{Binding EnableRemoveOrSaveButton}" Command="{Binding RemoveSelectedCommand}"/>
+                            <Button Content="Load" Command="{Binding ImportMeshCommand}"/>
+                            <Button Content="Save Selected" IsEnabled="{Binding EnableRemoveOrSaveButton}" Command="{Binding SaveSelectedMeshCommand}" CommandParameter="{Binding SelectedItem, ElementName=MeshList}"/>
+                            <Button Content="Save All" IsEnabled="{Binding EnableSaveAllButton}" Command="{Binding SaveAllMeshesCommand}"/>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0">
+                        <views:MeshRendererView/>
+                    </GroupBox>
+                    <Grid Grid.Row="1" IsEnabled="{Binding HasSelection}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="Properties"  Grid.Column="0">
+
+                        </GroupBox>
+                        <GroupBox Header="Mesh attributes" Grid.Column="1">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox IsChecked="{Binding WritePositions}" IsEnabled="{Binding EnablePositions}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="POSITION"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox IsChecked="{Binding WriteIndices}" IsEnabled="{Binding EnableIndices}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="INDEX"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox IsChecked="{Binding WriteNormals}" IsEnabled="{Binding EnableNormals}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="NORMAL"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox IsChecked="{Binding WriteColors}" IsEnabled="{Binding EnableColors}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="COLOR"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox IsChecked="{Binding WriteTexcoords}" IsEnabled="{Binding EnableUVs}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="TEXCOORD"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox IsChecked="{Binding WriteTangents}" IsEnabled="{Binding EnableTangents}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="TANGENT"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Physics"  Grid.Column="2">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox IsChecked="{Binding CookConvexMesh}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="COOK CONVEX MESH"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox IsChecked="{Binding CookTriangleMesh}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="COOK TRIANGLE MESH"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Animation" IsEnabled="{Binding EnableAnimationSection}" Grid.Column="3">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <StackPanel>
+                                        <Label Content="ANIMATION CLIP"/>
+                                        <ComboBox/>
+                                        <StackPanel Orientation="Horizontal" >
+                                            <CheckBox HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                            <Label Content="EXPORT ANIMATION"/>
+                                        </StackPanel>
+                                        <Label Content="Speed"/>
+                                        <controls:NumericUpDown Value="1" Minimum="0.01" Maximum="10.0"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0" Content="Play"/>
+                                        <Button Grid.Column="1" Content="Stop"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</controls:MetroWindow>
+
