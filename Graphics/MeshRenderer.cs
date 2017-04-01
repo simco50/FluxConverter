@@ -39,9 +39,9 @@ namespace FluxConverterTool.Graphics
         private EffectShaderResourceVariable _normalTextureVar;
         private EffectScalarVariable _useNormalTextureVar;
 
-        public void SetMesh(FluxMesh mesh)
+        public void SetMesh(object mesh)
         {
-            _mesh = mesh;
+            _mesh = mesh as FluxMesh;
             if (_mesh == null)
                 return;
             CreateBuffers();

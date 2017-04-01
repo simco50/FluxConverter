@@ -3,11 +3,11 @@
 namespace FluxConverterTool.Views
 {
     /// <summary>
-    /// Interaction logic for DebugLogView.xaml
+    /// Interaction logic for HelpWindowView.xaml
     /// </summary>
-    public partial class DebugLogView : MetroWindow
+    public partial class HelpWindowView : MetroWindow
     {
-        public DebugLogView()
+        public HelpWindowView()
         {
             InitializeComponent();
         }

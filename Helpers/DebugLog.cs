@@ -12,6 +12,7 @@ namespace FluxConverterTool.Helpers
     public enum LogSeverity
     {
         Info,
+        InfoMessageBox,
         Warning,
         Error,
     }
@@ -82,6 +83,7 @@ namespace FluxConverterTool.Helpers
             {
                 case LogSeverity.Info:
                     break;
+                case LogSeverity.InfoMessageBox:
                 case LogSeverity.Warning:
                     MetroWindow window = Application.Current.MainWindow as MetroWindow;
                     MetroDialogSettings settings = new MetroDialogSettings();

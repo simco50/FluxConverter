@@ -106,8 +106,7 @@ namespace FluxConverterTool.Models
                 exportingDialog.Close();
                 if(count > 1)
                     ((MetroWindow) Application.Current.MainWindow).ShowMessageAsync("Export", $"Exported {count} mesh(es) successfully");
-                DebugLog.Log($"Exported {count}", "Mesh Formatter");
-
+                DebugLog.Log($"Exported {count} meshes", "Mesh Formatter");
             };
             worker.RunWorkerAsync(request);
         }

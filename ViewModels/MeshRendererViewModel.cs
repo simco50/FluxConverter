@@ -13,8 +13,6 @@ namespace FluxConverterTool.ViewModels
     {
         public D3DViewport Viewport { get; set; } = new D3DViewport();
 
-
-
         public MeshRendererViewModel()
         {
             Messenger.Default.Register<MvvmMessage>(this, OnMessageReceived);
@@ -22,8 +20,8 @@ namespace FluxConverterTool.ViewModels
 
         void OnMessageReceived(MvvmMessage message)
         {
-            if (message.Type == MessageType.MeshUpdate && message.Data != null)
-                Viewport.MeshRenderer.SetMesh((FluxMesh)message.Data);
+            if (message.Type == MessageType.MeshUpdate)
+                Viewport.MeshRenderer.SetMesh(message.Data);
             else if (message.Type == MessageType.MeshLoadDiffuseTexture)
                 Viewport.MeshRenderer.SetDiffuseTexture((string)message.Data);
             else if (message.Type == MessageType.MeshLoadNormalTexture)

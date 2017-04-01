@@ -1,4 +1,5 @@
 ﻿using FluxConverterTool.Graphics.ImageControl;
+using SharpDX;
 using SharpDX.Direct3D10;
 
 namespace FluxConverterTool.Graphics

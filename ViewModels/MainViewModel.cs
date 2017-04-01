@@ -8,7 +8,8 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using FluxConverterTool.Helpers;
-using ParticleEditor.Views;
+using FluxConverterTool.Views;
+using DebugLogView = FluxConverterTool.Views.DebugLogView;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
@@ -311,7 +312,14 @@ namespace FluxConverterTool.ViewModels
         private void ShowDebugLog()
         {
             DebugLogView view = new DebugLogView();
-            view.Show();
+            view.ShowDialog();
+        }
+        public RelayCommand ShowHelpWindowCommand => new RelayCommand(ShowHelpWindow);
+
+        private void ShowHelpWindow()
+        {
+            HelpWindowView view = new HelpWindowView();
+            view.ShowDialog();
         }
 
         #endregion

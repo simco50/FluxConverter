@@ -10,11 +10,22 @@
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         x:Class="FluxConverterTool.Views.MainView"
         mc:Ignorable="d"
-        Title="MainView" Height="720" Width="1240" Icon="/FluxConverterTool;component/Logo.ico">
+        Title="Flux Converter" Height="720" Width="1240" Icon="/FluxConverterTool;component/Logo.ico">
+
+    <controls:MetroWindow.InputBindings>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveSelectedMeshCommand}"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding ImportMeshCommand}"/>
+        <KeyBinding Key="F1" Command="{Binding ShowHelpWindowCommand}"/>
+        <KeyBinding Key="F2" Command="{Binding ShowDebugLogCommand}"/>
+        <KeyBinding Key="Delete" Command="{Binding RemoveSelectedCommand}"/>
+    </controls:MetroWindow.InputBindings>
+    
+    <controls:MetroWindow.DataContext>
+        <viewModels:MainViewModel/>
+    </controls:MetroWindow.DataContext>
+    
     <Grid>
-        <Grid.DataContext>
-            <viewModels:MainViewModel/>
-        </Grid.DataContext>
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -29,15 +40,27 @@
                                 <Setter Property="Height" Value="18"/>
                             </Style>
                         </Menu.Resources>
-                        <MenuItem Header="Edit">
-                            <MenuItem Header="Help" InputGestureText="F1">
+                        <MenuItem Header="File">
+                            <MenuItem Command="{Binding ImportMeshCommand}" Header="Import..." InputGestureText="Ctrl + O">
+                                <MenuItem.Icon>
+                                    <Image Source="/FluxConverterTool;component/Resources/Icons/Open.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem IsEnabled="{Binding IsSingleSelected}" Command="{Binding SaveSelectedMeshCommand}" Header="Export selected..." InputGestureText="Ctrl + S">
+                                <MenuItem.Icon>
+                                    <Image Source="/FluxConverterTool;component/Resources/Icons/Save.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Header="Help">
+                            <MenuItem Header="Help" Command="{Binding ShowHelpWindowCommand}" InputGestureText="F1">
                                 <MenuItem.Icon>
                                     <Image Source="/FluxConverterTool;component/Resources/Icons/Info.png"/>
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Command="{Binding ShowDebugLogCommand}" Header="Log">
+                            <MenuItem Command="{Binding ShowDebugLogCommand}" Header="Log" InputGestureText="F2">
                                 <MenuItem.Icon>
-                                    <Image Source="/FluxConverterTool;component/Resources/Icons/Info.png"/>
+                                    <Image Source="/FluxConverterTool;component/Resources/Icons/Log.png"/>
                                 </MenuItem.Icon>
                             </MenuItem>
                         </MenuItem>
