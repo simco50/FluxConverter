@@ -32,7 +32,9 @@ namespace FluxConverterTool.ViewModels
         public int SelectedMeshCount => _selectedMeshes.Count;
 
         public bool IsSingleSelected => _selectedMeshes.Count == 1;
-        public bool EnableAnimationSection => IsSingleSelected && _selectedMeshes[1].HasAnimations;
+        public bool EnableLoadDiffuseTextureButton => IsSingleSelected && _selectedMeshes[0].UVs.Count > 0;
+        public bool EnableLoadNormalTextureButton => IsSingleSelected && _selectedMeshes[0].Normals.Count > 0 && _selectedMeshes[0].Tangents.Count > 0;
+        public bool EnableAnimationSection => IsSingleSelected && _selectedMeshes[0].HasAnimations;
 
         public bool EnableRemoveOrSaveButton => _selectedMeshes.Count != 0;
         public bool HasSelection => _selectedMeshes.Count > 0;
@@ -219,6 +221,11 @@ namespace FluxConverterTool.ViewModels
             RaisePropertyChanged("TotalVertexCount");
             RaisePropertyChanged("TotalTriangleCount");
             RaisePropertyChanged("SelectedMeshCount");
+
+            RaisePropertyChanged("EnableLoadNormalTextureButton");
+            RaisePropertyChanged("EnableLoadDiffuseTextureButton");
+
+            RaisePropertyChanged("EnableAnimationSection");
         }
 
         public RelayCommand ImportMeshCommand => new RelayCommand(ImportMeshes);
@@ -278,15 +285,25 @@ namespace FluxConverterTool.ViewModels
             _formatter.ExportMeshesAsync(request);
         }
 
-        public RelayCommand LoadTextureCommand => new RelayCommand(LoadTexture);
+        public RelayCommand LoadDiffuseTextureCommand => new RelayCommand(LoadDiffuseTexture);
 
-        void LoadTexture()
+        void LoadDiffuseTexture()
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "Images (*.jpg;*.png;*.dds)|*.jpg;*.png;*.dds";
+            dialog.Filter = "Images (*.jpg;*.png;*.dds)|*.jpg;*.png;*.dds|All files (*.*)|*.*";
             if (dialog.ShowDialog() == false)
                 return;
-            Messenger.Default.Send<MvvmMessage>(new MvvmMessage(MessageType.MeshSetTexture, dialog.FileName));
+            Messenger.Default.Send<MvvmMessage>(new MvvmMessage(MessageType.MeshLoadDiffuseTexture, dialog.FileName));
+        }
+
+        public RelayCommand LoadNormalextureCommand => new RelayCommand(LoadNormalexture);
+        void LoadNormalexture()
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Images (*.jpg;*.png;*.dds)|*.jpg;*.png;*.dds|All files (*.*)|*.*";
+            if (dialog.ShowDialog() == false)
+                return;
+            Messenger.Default.Send<MvvmMessage>(new MvvmMessage(MessageType.MeshLoadNormalTexture, dialog.FileName));
         }
 
         public RelayCommand ShowDebugLogCommand => new RelayCommand(ShowDebugLog);

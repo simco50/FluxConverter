@@ -24,8 +24,10 @@ namespace FluxConverterTool.ViewModels
         {
             if (message.Type == MessageType.MeshUpdate && message.Data != null)
                 Viewport.MeshRenderer.SetMesh((FluxMesh)message.Data);
-            else if (message.Type == MessageType.MeshSetTexture)
-                Viewport.MeshRenderer.SetTexture((string)message.Data);
+            else if (message.Type == MessageType.MeshLoadDiffuseTexture)
+                Viewport.MeshRenderer.SetDiffuseTexture((string)message.Data);
+            else if (message.Type == MessageType.MeshLoadNormalTexture)
+                Viewport.MeshRenderer.SetNormalTexture((string)message.Data);
         }
 
         public float CameraZoom

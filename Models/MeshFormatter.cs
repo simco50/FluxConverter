@@ -50,7 +50,7 @@ namespace FluxConverterTool.Models
             FluxMesh mesh = new FluxMesh();
             mesh.Name = Path.GetFileNameWithoutExtension(filePath);
             AssimpContext context = new AssimpContext();
-            Scene scene = context.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.JoinIdenticalVertices);
+            Scene scene = context.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.CalculateTangentSpace | PostProcessSteps.FlipUVs);
 
             foreach (Mesh m in scene.Meshes)
             {
@@ -65,7 +65,7 @@ namespace FluxConverterTool.Models
                     if (m.HasTextureCoords(0))
                     {
                         Vector3 texCoord = m.TextureCoordinateChannels[0][i].ToVector3();
-                        mesh.UVs.Add(new Vector2(texCoord.X, texCoord.Z));
+                        mesh.UVs.Add(new Vector2(texCoord.X, texCoord.Y));
                     }
                     if (m.HasVertexColors(0))
                         mesh.VertexColors.Add(m.VertexColorChannels[0][i].ToColor());

@@ -45,6 +45,7 @@ namespace FluxConverterTool.Models
         public PhysicsMesh ConvexMesh { get; set; } = null;
         public PhysicsMesh TriangleMesh { get; set; } = null;
 
-        public ShaderResourceView Texture = null;
+        public ShaderResourceView DiffuseTexture = null;
+        public ShaderResourceView NormalTexture = null;
     }
 }

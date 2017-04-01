@@ -103,12 +103,11 @@
                                     <Label Content="{Binding SelectedMeshCount}" ContentStringFormat="SELECTED {0} MESH(ES)"/>
                                     <Label Content="{Binding TotalVertexCount}" ContentStringFormat="VERTEX COUNT: {0}"/>
                                     <Label Content="{Binding TotalTriangleCount}" ContentStringFormat="TRIANGLE COUNT: {0}"/>
-                                    <StackPanel Orientation="Horizontal" >
-                                        <CheckBox HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                                        <Label Content="FLIP UVs"/>
-                                    </StackPanel>
                                 </StackPanel>
-                                <Button Grid.Row="1" Content="Load Texture..." Command="{Binding LoadTextureCommand}"  IsEnabled="{Binding IsSingleSelected}"/>
+                                <StackPanel Grid.Row="1">
+                                    <Button Content="Diffuse texture..." Command="{Binding LoadDiffuseTextureCommand}"  IsEnabled="{Binding EnableLoadDiffuseTextureButton}"/>
+                                    <Button Content="Normal map..." Command="{Binding LoadNormalextureCommand}"  IsEnabled="{Binding EnableLoadNormalTextureButton}"/>
+                                </StackPanel>
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="Mesh attributes" Grid.Column="1">
