@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using FluxConverterTool.Graphics.ImageControl;
+using FluxConverterTool.Helpers;
 using FluxConverterTool.Models;
 using SharpDX;
 using SharpDX.D3DCompiler;
@@ -75,6 +76,19 @@ namespace FluxConverterTool.Graphics
                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, InputElement.AppendAligned, 0, InputClassification.PerVertexData, 0),
             };
             _inputLayout = new InputLayout(_context.Device, _technique.GetPassByIndex(0).Description.Signature, vertexLayout);
+
+            DebugLog.Log($"Initialized", "Mesh Renderer");
+        }
+
+        public void Shutdown()
+        {
+            if (_vertexBuffer != null)
+                Disposer.RemoveAndDispose(ref _vertexBuffer);
+            if (_indexBuffer != null)
+                Disposer.RemoveAndDispose(ref _indexBuffer);
+            if(_effect != null)
+                Disposer.RemoveAndDispose(ref _effect);
+            DebugLog.Log($"Shutdown", "Mesh Renderer");
         }
 
         void CreateBuffers()
@@ -115,6 +129,8 @@ namespace FluxConverterTool.Graphics
 
             stream = DataStream.Create(vertices.ToArray(), false, false);
             _vertexBuffer = new Buffer(_context.Device, stream, desc);
+
+            DebugLog.Log($"Buffers initialized", "Mesh Renderer");
         }
 
         public void Render()

@@ -29,13 +29,19 @@
                                 <Setter Property="Height" Value="18"/>
                             </Style>
                         </Menu.Resources>
-                        <MenuItem Header="File">
+                        <MenuItem Header="Edit">
                             <MenuItem Header="Help" InputGestureText="F1">
                                 <MenuItem.Icon>
                                     <Image Source="/FluxConverterTool;component/Resources/Icons/Info.png"/>
                                 </MenuItem.Icon>
                             </MenuItem>
+                            <MenuItem Command="{Binding ShowDebugLogCommand}" Header="Log">
+                                <MenuItem.Icon>
+                                    <Image Source="/FluxConverterTool;component/Resources/Icons/Info.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
                         </MenuItem>
+                        
                     </Menu>
                 </DockPanel>
             </Grid>

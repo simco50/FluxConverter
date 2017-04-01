@@ -32,6 +32,8 @@ namespace FluxConverterTool.Models
             _foundation = new Foundation();
             _physics = new Physics(_foundation);
             Cooking = new Cooking(_foundation, _physics);
+
+            DebugLog.Log("Initialized", "Mesh Formatter");
         }
 
         public void Shutdown()
@@ -39,6 +41,8 @@ namespace FluxConverterTool.Models
             Cooking.Release();
             _physics.Release();
             _foundation.Release();
+
+            DebugLog.Log("Shutdown", "Mesh Formatter");
         }
 
         public FluxMesh LoadMesh(string filePath)
@@ -73,11 +77,15 @@ namespace FluxConverterTool.Models
                 }
             }
 
+            DebugLog.Log($"Imported mesh '{mesh.Name}'", "Mesh Formatter");
+
             return mesh;
         }
 
         public void ExportMeshesAsync(MeshConvertRequest request)
         {
+            int count = request.MeshQueue.Count;
+
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += MeshWriter_DoWork;
             worker.WorkerReportsProgress = true;
@@ -96,8 +104,10 @@ namespace FluxConverterTool.Models
             worker.RunWorkerCompleted += (sender, args) =>
             {
                 exportingDialog.Close();
-                if(request.MeshQueue.Count > 1)
-                    ((MetroWindow) Application.Current.MainWindow).ShowMessageAsync("Export", $"Exported {request.MeshQueue.Count} mesh(es) successfully");
+                if(count > 1)
+                    ((MetroWindow) Application.Current.MainWindow).ShowMessageAsync("Export", $"Exported {count} mesh(es) successfully");
+                DebugLog.Log($"Exported {count}", "Mesh Formatter");
+
             };
             worker.RunWorkerAsync(request);
         }
@@ -139,6 +149,7 @@ namespace FluxConverterTool.Models
                 }
                 progress += progressIncrement;
                 stream.Close();
+                DebugLog.Log($"Exported {mesh.Name}", "Mesh Formatter");
             }
         }
 
@@ -207,7 +218,11 @@ namespace FluxConverterTool.Models
             try
             {
                 if (mesh.ConvexMesh == null)
-                    mesh.ConvexMesh = Cooking.CreateConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+                {
+                    mesh.ConvexMesh =
+                        Cooking.CreateConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+                    DebugLog.Log($"Cooked convex mesh for {mesh.Name}", "Mesh Formatter");
+                }
 
             }
             catch (Exception e)
@@ -229,7 +244,11 @@ namespace FluxConverterTool.Models
             try
             {
                 if (mesh.TriangleMesh == null)
-                    mesh.TriangleMesh = Cooking.CreateTriangleMesh(new TriangleMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+                {
+                    mesh.TriangleMesh =
+                        Cooking.CreateTriangleMesh(new TriangleMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+                    DebugLog.Log($"Cooked triangle mesh for {mesh.Name}", "Mesh Formatter");
+                }
             }
             catch (Exception e)
             {

@@ -120,6 +120,7 @@
     <Compile Include="Helpers\AssimpConversions.cs" />
     <Compile Include="Helpers\BinaryReaderExtensions.cs" />
     <Compile Include="Helpers\Converters.cs" />
+    <Compile Include="Helpers\DebugLog.cs" />
     <Compile Include="Helpers\MvvmMessage.cs" />
     <Compile Include="Graphics\D3DViewport.cs" />
     <Compile Include="Graphics\ImageControl\Disposer.cs" />
@@ -132,9 +133,13 @@
     <Compile Include="Graphics\GraphicsContext.cs" />
     <Compile Include="Models\Grid.cs" />
     <Compile Include="Models\MeshFormatter.cs" />
+    <Compile Include="ViewModels\DebugLogViewModel.cs" />
     <Compile Include="ViewModels\ExportingDialogViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MeshRendererViewModel.cs" />
+    <Compile Include="Views\DebugLogView.xaml.cs">
+      <DependentUpon>DebugLogView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ExportingDialog.xaml.cs">
       <DependentUpon>ExportingDialog.xaml</DependentUpon>
     </Compile>
@@ -148,6 +153,10 @@
     <Compile Include="Views\MeshRendererView.xaml.cs">
       <DependentUpon>MeshRendererView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\DebugLogView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\ExportingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

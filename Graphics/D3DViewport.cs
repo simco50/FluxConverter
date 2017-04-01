@@ -1,4 +1,5 @@
 ﻿using FluxConverterTool.Graphics.ImageControl;
+using FluxConverterTool.Helpers;
 using FluxConverterTool.Models;
 using SharpDX.Direct3D10;
 using Device1 = SharpDX.Direct3D10.Device1;
@@ -25,11 +26,14 @@ namespace FluxConverterTool.Graphics
         
             MeshRenderer = new MeshRenderer();
             MeshRenderer.Initialize(Context);
+            DebugLog.Log($"Initialized", "Viewport");
+
         }
 
         public void Deinitialize()
         {
-            
+            MeshRenderer.Shutdown();
+            DebugLog.Log($"Shutdown", "Viewport");
         }
 
         public void Update(float deltaT)

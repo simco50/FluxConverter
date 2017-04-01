@@ -8,9 +8,9 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using FluxConverterTool.Helpers;
+using ParticleEditor.Views;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
-using SharpDX.Direct3D10;
 
 namespace FluxConverterTool.ViewModels
 {
@@ -152,14 +152,23 @@ namespace FluxConverterTool.ViewModels
 
         public MainViewModel()
         {
+            FileLogger fileLogger = new FileLogger("ApplicationLog.log");
+            DebugLog.LogEvent += fileLogger.LogInfo;
+            ApplicationLogger appLogger = new ApplicationLogger();
+            DebugLog.LogEvent += appLogger.LogInfo;
+
             Meshes.CollectionChanged += Meshes_CollectionChanged;
             _formatter = new MeshFormatter();
             _formatter.Initialize();
+
+            DebugLog.Log("Initialized", "Application");
         }
 
         ~MainViewModel()
         {
             _formatter.Shutdown();
+
+            DebugLog.Log("Shutdown", "Application");
         }
 
         private void Meshes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -224,6 +233,8 @@ namespace FluxConverterTool.ViewModels
             _selectedMeshes.Clear();
             Messenger.Default.Send<MvvmMessage, MeshRendererViewModel>(new MvvmMessage(MessageType.MeshUpdate, null));
             ProperyChanged();
+
+            DebugLog.Log("Removed meshes", "Application");
         }
 
         void ImportMeshes()
@@ -276,6 +287,14 @@ namespace FluxConverterTool.ViewModels
             if (dialog.ShowDialog() == false)
                 return;
             Messenger.Default.Send<MvvmMessage>(new MvvmMessage(MessageType.MeshSetTexture, dialog.FileName));
+        }
+
+        public RelayCommand ShowDebugLogCommand => new RelayCommand(ShowDebugLog);
+
+        private void ShowDebugLog()
+        {
+            DebugLogView view = new DebugLogView();
+            view.Show();
         }
 
         #endregion
