@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using SharpDX;
 using GalaSoft.MvvmLight;
+using PhysxNet;
+using SharpDX.Direct3D10;
 
 namespace FluxConverterTool.Models
 {
@@ -39,5 +41,10 @@ namespace FluxConverterTool.Models
         public bool IsSelected { get; set; } = false;
 
         public bool HasAnimations => false;
+
+        public PhysicsMesh ConvexMesh { get; set; } = null;
+        public PhysicsMesh TriangleMesh { get; set; } = null;
+
+        public ShaderResourceView Texture = null;
     }
 }

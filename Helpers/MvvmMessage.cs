@@ -3,6 +3,7 @@
     public enum MessageType
     {
         MeshUpdate,
+        MeshSetTexture,
     }
 
     public class MvvmMessage

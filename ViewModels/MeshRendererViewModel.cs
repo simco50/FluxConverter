@@ -5,12 +5,28 @@ using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using FluxConverterTool.Helpers;
 using FluxConverterTool.Models;
+using SharpDX.Direct3D10;
 
 namespace FluxConverterTool.ViewModels
 {
     public class MeshRendererViewModel : ViewModelBase
     {
         public D3DViewport Viewport { get; set; } = new D3DViewport();
+
+
+
+        public MeshRendererViewModel()
+        {
+            Messenger.Default.Register<MvvmMessage>(this, OnMessageReceived);
+        }
+
+        void OnMessageReceived(MvvmMessage message)
+        {
+            if (message.Type == MessageType.MeshUpdate && message.Data != null)
+                Viewport.MeshRenderer.SetMesh((FluxMesh)message.Data);
+            else if (message.Type == MessageType.MeshSetTexture)
+                Viewport.MeshRenderer.SetTexture((string)message.Data);
+        }
 
         public float CameraZoom
         {
@@ -25,17 +41,6 @@ namespace FluxConverterTool.ViewModels
                 Viewport.Context.Camera.Zoom = value;
                 RaisePropertyChanged("CameraZoom");
             }
-        }
-
-        public MeshRendererViewModel()
-        {
-            Messenger.Default.Register<MvvmMessage>(this, OnMessageReceived);
-        }
-
-        void OnMessageReceived(MvvmMessage message)
-        {
-            if (message.Type == MessageType.MeshUpdate && message.Data != null)
-                Viewport.MeshRenderer.SetMesh((FluxMesh)message.Data);
         }
 
         public RelayCommand<MouseWheelEventArgs> OnScroll =>

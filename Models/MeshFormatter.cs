@@ -11,6 +11,7 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using PhysxNet;
 using SharpDX;
+using System;
 
 namespace FluxConverterTool.Models
 {
@@ -23,17 +24,20 @@ namespace FluxConverterTool.Models
     public class MeshFormatter
     {
         private Foundation _foundation;
-        private Cooking _cooking;
+        public Cooking Cooking;
+        private Physics _physics;
 
         public void Initialize()
         {
             _foundation = new Foundation();
-            _cooking = new Cooking(_foundation);
+            _physics = new Physics(_foundation);
+            Cooking = new Cooking(_foundation, _physics);
         }
 
         public void Shutdown()
         {
-            _cooking.Release();
+            Cooking.Release();
+            _physics.Release();
             _foundation.Release();
         }
 
@@ -42,8 +46,7 @@ namespace FluxConverterTool.Models
             FluxMesh mesh = new FluxMesh();
             mesh.Name = Path.GetFileNameWithoutExtension(filePath);
             AssimpContext context = new AssimpContext();
-            Scene scene = context.ImportFile(filePath,
-                PostProcessSteps.Triangulate | PostProcessSteps.JoinIdenticalVertices);
+            Scene scene = context.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.JoinIdenticalVertices);
 
             foreach (Mesh m in scene.Meshes)
             {
@@ -200,22 +203,43 @@ namespace FluxConverterTool.Models
         private bool WriteConvexMeshData(FluxMesh mesh, Stream stream)
         {
             BinaryWriter writer = new BinaryWriter(stream, Encoding.Default);
-            MemoryStream memStream = new MemoryStream();
-            _cooking.CookConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices), memStream);
+
+            try
+            {
+                if (mesh.ConvexMesh == null)
+                    mesh.ConvexMesh = Cooking.CreateConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                return false;
+            }
+
             writer.Write("CONVEXMESH");
-            writer.Write(memStream.Length);
-            writer.Write(memStream.GetBuffer());
+            writer.Write(mesh.ConvexMesh.MeshData.Count);
+            writer.Write(mesh.ConvexMesh.MeshData.ToArray());
             return true;
         }
 
         private bool WriteTriangleMeshData(FluxMesh mesh, Stream stream)
         {
             BinaryWriter writer = new BinaryWriter(stream, Encoding.Default);
-            MemoryStream memStream = new MemoryStream();
-            _cooking.CookTriangleMesh(new TriangleMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices), memStream);
+
+            try
+            {
+                if (mesh.TriangleMesh == null)
+                    mesh.TriangleMesh = Cooking.CreateTriangleMesh(new TriangleMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                return false;
+            }
+
             writer.Write("TRIANGLEMESH");
-            writer.Write(memStream.Length);
-            writer.Write(memStream.GetBuffer());
+            writer.Write(mesh.TriangleMesh.MeshData.Count);
+            writer.Write(mesh.TriangleMesh.MeshData.ToArray());
             return true;
         }
 

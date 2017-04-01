@@ -10,6 +10,7 @@ using GalaSoft.MvvmLight.Messaging;
 using FluxConverterTool.Helpers;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using SharpDX.Direct3D10;
 
 namespace FluxConverterTool.ViewModels
 {
@@ -38,7 +39,7 @@ namespace FluxConverterTool.ViewModels
         public bool EnableSaveAllButton => Meshes.Count > 0;
 
         public bool EnablePositions => false;
-        public bool EnableIndices => _selectedMeshes.Count(mesh => mesh.Indices.Count > 0) == _selectedMeshes.Count;
+        public bool EnableIndices => false;
         public bool EnableNormals => _selectedMeshes.Count(mesh => mesh.Normals.Count > 0) == _selectedMeshes.Count;
         public bool EnableTangents => _selectedMeshes.Count(mesh => mesh.Tangents.Count > 0) == _selectedMeshes.Count;
         public bool EnableUVs => _selectedMeshes.Count(mesh => mesh.UVs.Count > 0) == _selectedMeshes.Count;
@@ -264,6 +265,17 @@ namespace FluxConverterTool.ViewModels
             request.SaveDirectory = dialog.SelectedPath;
             request.MeshQueue = new Queue<FluxMesh>(meshes);
             _formatter.ExportMeshesAsync(request);
+        }
+
+        public RelayCommand LoadTextureCommand => new RelayCommand(LoadTexture);
+
+        void LoadTexture()
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Images (*.jpg;*.png;*.dds)|*.jpg;*.png;*.dds";
+            if (dialog.ShowDialog() == false)
+                return;
+            Messenger.Default.Send<MvvmMessage>(new MvvmMessage(MessageType.MeshSetTexture, dialog.FileName));
         }
 
         #endregion

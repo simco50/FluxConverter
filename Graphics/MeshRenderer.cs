@@ -10,10 +10,11 @@ using SharpDX.DXGI;
 
 namespace FluxConverterTool.Graphics
 {
-    public struct VertexPosNorm
+    public struct VertexPosNormTex
     {
         public Vector3 Position;
         public Vector3 Normal;
+        public Vector2 TexCoord;
     }
 
     public class MeshRenderer
@@ -29,6 +30,11 @@ namespace FluxConverterTool.Graphics
 
         private GraphicsContext _context;
 
+        private EffectMatrixVariable _worldMatrixVar;
+        private EffectMatrixVariable _wvpMatrixVar;
+        private EffectShaderResourceVariable _diffuseTextureVar;
+        private EffectScalarVariable _useDiffuseTextureVar;
+
         public void SetMesh(FluxMesh mesh)
         {
             if (mesh == _mesh)
@@ -37,22 +43,36 @@ namespace FluxConverterTool.Graphics
             CreateBuffers();
         }
 
+        public void SetTexture(string filePath)
+        {
+            if (_mesh != null)
+            {
+                if(_mesh.Texture != null)
+                    _mesh.Texture.Dispose();
+                _mesh.Texture = ShaderResourceView.FromFile(_context.Device, filePath);
+            }
+        }
+
         public void Initialize(GraphicsContext context)
         {
             _context = context;
 
             CompilationResult result = ShaderBytecode.CompileFromFile("./Resources/Shaders/Default_Forward.fx", "fx_4_0");
             if (result.HasErrors)
-            {
                 return;
-            }
             _effect = new Effect(_context.Device, result.Bytecode);
             _technique = _effect.GetTechniqueByIndex(0);
+
+            _useDiffuseTextureVar = _effect.GetVariableByName("gUseDiffuseTexture").AsScalar();
+            _diffuseTextureVar = _effect.GetVariableByName("gDiffuseTexture").AsShaderResource();
+            _wvpMatrixVar = _effect.GetVariableBySemantic("WORLDVIEWPROJECTION").AsMatrix();
+            _worldMatrixVar = _effect.GetVariableBySemantic("WORLD").AsMatrix();
 
             InputElement[] vertexLayout =
             {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0, 0, InputClassification.PerVertexData, 0),
-                new InputElement("NORMAL", 0, Format.R32G32B32_Float, InputElement.AppendAligned, 0, InputClassification.PerVertexData, 0)
+                new InputElement("NORMAL", 0, Format.R32G32B32_Float, InputElement.AppendAligned, 0, InputClassification.PerVertexData, 0),
+                new InputElement("TEXCOORD", 0, Format.R32G32_Float, InputElement.AppendAligned, 0, InputClassification.PerVertexData, 0),
             };
             _inputLayout = new InputLayout(_context.Device, _technique.GetPassByIndex(0).Description.Signature, vertexLayout);
         }
@@ -74,18 +94,22 @@ namespace FluxConverterTool.Graphics
             _indexBuffer = new Buffer(_context.Device, stream, desc);
 
             desc = new BufferDescription();
-            desc.SizeInBytes = Marshal.SizeOf(typeof(VertexPosNorm)) * _mesh.Positions.Count;
+            desc.SizeInBytes = Marshal.SizeOf(typeof(VertexPosNormTex)) * _mesh.Positions.Count;
             desc.BindFlags = BindFlags.VertexBuffer;
             desc.OptionFlags = ResourceOptionFlags.None;
             desc.Usage = ResourceUsage.Default;
             desc.CpuAccessFlags = CpuAccessFlags.None;
 
-            List<VertexPosNorm> vertices = new List<VertexPosNorm>();
+            List<VertexPosNormTex> vertices = new List<VertexPosNormTex>();
             for (int i = 0; i < _mesh.Positions.Count; i++)
             {
-                VertexPosNorm vertex = new VertexPosNorm();
-                vertex.Position = _mesh.Positions[i];
-                vertex.Normal = _mesh.Normals[i];
+                VertexPosNormTex vertex = new VertexPosNormTex();
+                if(_mesh.Positions.Count != 0)
+                    vertex.Position = _mesh.Positions[i];
+                if (_mesh.Normals.Count != 0)
+                    vertex.Normal = _mesh.Normals[i];
+                if (_mesh.UVs.Count != 0)
+                    vertex.TexCoord = _mesh.UVs[i];
                 vertices.Add(vertex);
             }
 
@@ -100,11 +124,14 @@ namespace FluxConverterTool.Graphics
 
             _context.Device.InputAssembler.InputLayout = _inputLayout;
             _context.Device.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R32_UInt, 0);
-            _context.Device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNorm)), 0));
+            _context.Device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNormTex)), 0));
             _context.Device.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-            _effect.GetVariableBySemantic("WORLDVIEWPROJECTION").AsMatrix().SetMatrix(Matrix.Identity * _context.Camera.ViewProjectionMatrix);
-            _effect.GetVariableBySemantic("WORLD").AsMatrix().SetMatrix(Matrix.Identity);
+            _wvpMatrixVar.AsMatrix().SetMatrix(Matrix.Identity * _context.Camera.ViewProjectionMatrix);
+            _worldMatrixVar.SetMatrix(Matrix.Identity);
+            _useDiffuseTextureVar.Set(_mesh.Texture != null);
+            if(_mesh.Texture != null)
+                _diffuseTextureVar.SetResource(_mesh.Texture);
 
             EffectTechniqueDescription desc = _technique.Description;
             for (int i = 0; i < desc.PassCount; i++)
