@@ -10,7 +10,7 @@ using Application = System.Windows.Application;
 using Device = SharpDX.Direct3D10.Device1;
 using Image = System.Windows.Controls.Image;
 
-namespace FluxConverterTool.ImageControl
+namespace FluxConverterTool.Graphics.ImageControl
 {
     public class DX10RenderCanvas : Image
     {

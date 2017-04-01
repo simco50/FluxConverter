@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using FluxConverterTool.ImageControl;
+using FluxConverterTool.Graphics;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;

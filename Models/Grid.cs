@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using FluxConverterTool.Helpers;
+using FluxConverterTool.Graphics;
 using SharpDX;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D;
@@ -8,7 +8,7 @@ using SharpDX.Direct3D10;
 using SharpDX.DXGI;
 using Buffer = SharpDX.Direct3D10.Buffer;
 
-namespace FluxConverterTool.Model
+namespace FluxConverterTool.Models
 {
     public struct VertexPosCol
     {

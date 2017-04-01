@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using Assimp;
 using FluxConverterTool.Helpers;
-using FluxConverterTool.PhysX;
 using FluxConverterTool.ViewModels;
 using FluxConverterTool.Views;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using PhysxNet;
 using SharpDX;
 
 namespace FluxConverterTool.Models
@@ -21,12 +17,26 @@ namespace FluxConverterTool.Models
     public class MeshConvertRequest
     {
         public Queue<FluxMesh> MeshQueue;
-        public PhysXCooker Cooker;
-        public string[] FilePaths;
+        public string SaveDirectory;
     };
 
     public class MeshFormatter
     {
+        private Foundation _foundation;
+        private Cooking _cooking;
+
+        public void Initialize()
+        {
+            _foundation = new Foundation();
+            _cooking = new Cooking(_foundation);
+        }
+
+        public void Shutdown()
+        {
+            _cooking.Release();
+            _foundation.Release();
+        }
+
         public FluxMesh LoadMesh(string filePath)
         {
             FluxMesh mesh = new FluxMesh();
@@ -99,13 +109,14 @@ namespace FluxConverterTool.Models
                 return;
 
             int meshCount = request.MeshQueue.Count;
-            int progressIncrement = 100 / meshCount / 2;
+            int progressIncrement = 100 / meshCount / 3;
             int progress = 0;
             for (int i = 0; i < meshCount; i++)
             {
                 FluxMesh mesh = request.MeshQueue.Dequeue();
-                
-                FileStream stream = File.Create(request.FilePaths[i]);
+
+                string filePath = $"{request.SaveDirectory}\\{mesh.Name}.flux";
+                FileStream stream = File.Create(filePath);
 
                 worker.ReportProgress(progress, $"'{mesh.Name}' Writing mesh data...");
                 WriteMesh(mesh, stream);
@@ -114,14 +125,14 @@ namespace FluxConverterTool.Models
                 if (mesh.CookConvexMesh)
                 {
                     worker.ReportProgress(progress, $"'{mesh.Name}' Cooking convex mesh...");
-                    WriteConvexMeshData(mesh, request.Cooker, stream);
+                    WriteConvexMeshData(mesh, stream);
                 }
                 progress += progressIncrement;
 
                 if (mesh.CookTriangleMesh)
                 {
                     worker.ReportProgress(progress, $"'{mesh.Name}' Cooking triangle mesh...");
-                    WriteTriangleMeshData(mesh, request.Cooker, stream);
+                    WriteTriangleMeshData(mesh, stream);
                 }
                 progress += progressIncrement;
                 stream.Close();
@@ -186,25 +197,38 @@ namespace FluxConverterTool.Models
             return true;
         }
 
-        private bool WriteConvexMeshData(FluxMesh mesh, PhysXCooker cooker, Stream stream)
+        private bool WriteConvexMeshData(FluxMesh mesh, Stream stream)
         {
             BinaryWriter writer = new BinaryWriter(stream, Encoding.Default);
-            byte[] data = cooker.CookConvexMesh(mesh);
+            MemoryStream memStream = new MemoryStream();
+            _cooking.CookConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices), memStream);
             writer.Write("CONVEXMESH");
-            writer.Write(data.Length);
-            writer.Write(data);
+            writer.Write(memStream.Length);
+            writer.Write(memStream.GetBuffer());
             return true;
         }
 
-        private bool WriteTriangleMeshData(FluxMesh mesh, PhysXCooker cooker, Stream stream)
+        private bool WriteTriangleMeshData(FluxMesh mesh, Stream stream)
         {
             BinaryWriter writer = new BinaryWriter(stream, Encoding.Default);
-            byte[] data = cooker.CookTriangleMesh(mesh);
+            MemoryStream memStream = new MemoryStream();
+            _cooking.CookTriangleMesh(new TriangleMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices), memStream);
             writer.Write("TRIANGLEMESH");
-            writer.Write(data.Length);
-            writer.Write(data);
+            writer.Write(memStream.Length);
+            writer.Write(memStream.GetBuffer());
             return true;
         }
 
+    }
+
+    public static class CookingExtensions
+    {
+        public static List<PxVec3> ToCookerVertices(this List<Vector3> vertices)
+        {
+            List<PxVec3> output = new List<PxVec3>(vertices.Count);
+            foreach(Vector3 v in vertices)
+                output.Add(new PxVec3(v.X, v.Y, v.Z));
+            return output;
+        }
     }
 }

@@ -8,7 +8,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using FluxConverterTool.Helpers;
-using FluxConverterTool.PhysX;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
@@ -17,8 +16,6 @@ namespace FluxConverterTool.ViewModels
     public class MainViewModel : ViewModelBase
     {
         #region VARIABLES
-
-        private readonly PhysXCooker _cooker;
         private readonly MeshFormatter _formatter;
 
         public ObservableCollection<FluxMesh> Meshes { get; set; } = new ObservableCollection<FluxMesh>();
@@ -28,6 +25,10 @@ namespace FluxConverterTool.ViewModels
         #endregion
 
         #region PROPERTIES
+
+        public int TotalVertexCount => _selectedMeshes.Sum(mesh => mesh.Positions.Count);
+        public int TotalTriangleCount => _selectedMeshes.Sum(mesh => mesh.Indices.Count / 3);
+        public int SelectedMeshCount => _selectedMeshes.Count;
 
         public bool IsSingleSelected => _selectedMeshes.Count == 1;
         public bool EnableAnimationSection => IsSingleSelected && _selectedMeshes[1].HasAnimations;
@@ -151,9 +152,13 @@ namespace FluxConverterTool.ViewModels
         public MainViewModel()
         {
             Meshes.CollectionChanged += Meshes_CollectionChanged;
-            _cooker = new PhysXCooker();
-            _cooker.Initialize();
             _formatter = new MeshFormatter();
+            _formatter.Initialize();
+        }
+
+        ~MainViewModel()
+        {
+            _formatter.Shutdown();
         }
 
         private void Meshes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -200,6 +205,10 @@ namespace FluxConverterTool.ViewModels
             RaisePropertyChanged("EnableSaveAllButton");
             RaisePropertyChanged("HasSelection");
             RaisePropertyChanged("EnableRemoveOrSaveButton");
+
+            RaisePropertyChanged("TotalVertexCount");
+            RaisePropertyChanged("TotalTriangleCount");
+            RaisePropertyChanged("SelectedMeshCount");
         }
 
         public RelayCommand ImportMeshCommand => new RelayCommand(ImportMeshes);
@@ -252,12 +261,7 @@ namespace FluxConverterTool.ViewModels
                 return;
 
             MeshConvertRequest request = new MeshConvertRequest();
-            request.Cooker = _cooker;
-
-            List<string> filePaths = new List<string>(meshes.Length);
-            for (int i = 0; i < meshes.Length; i++)
-                filePaths.Add($"{dialog.SelectedPath}\\{Meshes[i].Name}.flux");
-            request.FilePaths = filePaths.ToArray();
+            request.SaveDirectory = dialog.SelectedPath;
             request.MeshQueue = new Queue<FluxMesh>(meshes);
             _formatter.ExportMeshesAsync(request);
         }

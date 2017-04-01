@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:FluxConverterTool.Views"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:command="http://www.galasoft.ch/mvvmlight"
-             xmlns:imageControl="clr-namespace:FluxConverterTool.ImageControl"
              xmlns:viewModels="clr-namespace:FluxConverterTool.ViewModels"
+             xmlns:imageControl1="clr-namespace:FluxConverterTool.Graphics.ImageControl"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -15,7 +15,7 @@
             <viewModels:MeshRendererViewModel/>
         </Grid.DataContext>
         
-        <imageControl:DX10RenderCanvas Viewport="{Binding Viewport}" Stretch="Fill">
+        <imageControl1:DX10RenderCanvas Viewport="{Binding Viewport}" Stretch="Fill">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseWheel">
                     <command:EventToCommand Command="{Binding OnScroll}" PassEventArgsToCommand="True"/>
@@ -30,6 +30,6 @@
                     <command:EventToCommand Command="{Binding OnMouseLeave}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-        </imageControl:DX10RenderCanvas>
+        </imageControl1:DX10RenderCanvas>
     </Grid>
 </UserControl>

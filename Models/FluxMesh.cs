@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using SharpDX;
-using Assimp;
 using GalaSoft.MvvmLight;
-using SharpDX.Direct3D10;
 
 namespace FluxConverterTool.Models
 {

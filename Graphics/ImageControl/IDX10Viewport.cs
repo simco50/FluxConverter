@@ -1,7 +1,7 @@
 ﻿using SharpDX.Direct3D10;
 using Device = SharpDX.Direct3D10.Device1;
 
-namespace FluxConverterTool.ImageControl
+namespace FluxConverterTool.Graphics.ImageControl
 {
     public interface IDX10Viewport
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluxConverterTool.ImageControl
+namespace FluxConverterTool.Graphics.ImageControl
 {
     public static class Disposer
     {

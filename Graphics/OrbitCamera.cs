@@ -1,8 +1,9 @@
 ﻿using System.Windows.Forms;
+using FluxConverterTool.Graphics.ImageControl;
 using SharpDX;
 using Point = System.Drawing.Point;
 
-namespace FluxConverterTool.ImageControl
+namespace FluxConverterTool.Graphics
 {
     public class OrbitCamera
     {

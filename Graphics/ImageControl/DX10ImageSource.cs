@@ -1,11 +1,11 @@
-﻿namespace FluxConverterTool.ImageControl
-{
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Windows;
-    using System.Windows.Interop;
-    using SharpDX.Direct3D9;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
+using SharpDX.Direct3D9;
 
+namespace FluxConverterTool.Graphics.ImageControl
+{
     class DX10ImageSource : D3DImage, IDisposable
     {
         [DllImport("user32.dll", SetLastError = false)]

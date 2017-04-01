@@ -88,7 +88,16 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Properties"  Grid.Column="0">
-
+                            <StackPanel>
+                                <Label Content="{Binding SelectedMeshCount}" ContentStringFormat="SELECTED {0} MESH(ES)"/>
+                                <Label Content="{Binding TotalVertexCount}" ContentStringFormat="VERTEX COUNT: {0}"/>
+                                <Label Content="{Binding TotalTriangleCount}" ContentStringFormat="TRIANGLE COUNT: {0}"/>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                    <Label Content="FLIP UVs"/>
+                                </StackPanel>
+                                <Button Content="Load Texture..." IsEnabled="{Binding IsSingleSelected}"/>
+                            </StackPanel>
                         </GroupBox>
                         <GroupBox Header="Mesh attributes" Grid.Column="1">
                             <StackPanel>

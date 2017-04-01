@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using FluxConverterTool.Graphics.ImageControl;
 using FluxConverterTool.Models;
 using SharpDX;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D10;
 using SharpDX.DXGI;
-using Device1 = SharpDX.Direct3D10.Device1;
-using FluxConverterTool.Model;
 
-namespace FluxConverterTool.ImageControl
+namespace FluxConverterTool.Graphics
 {
     public struct VertexPosNorm
     {

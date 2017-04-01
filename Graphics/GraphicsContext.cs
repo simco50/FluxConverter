@@ -1,7 +1,7 @@
-﻿using FluxConverterTool.ImageControl;
+﻿using FluxConverterTool.Graphics.ImageControl;
 using SharpDX.Direct3D10;
 
-namespace FluxConverterTool.Model
+namespace FluxConverterTool.Graphics
 {
     public class GraphicsContext
     {
