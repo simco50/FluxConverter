@@ -13,7 +13,7 @@ struct VS_OUTPUT
 
 RasterizerState BackfaceCull
 {
-	CullMode = BACK;
+	CullMode = NONE;
 	FillMode = WIREFRAME;
 };
 

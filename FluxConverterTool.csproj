@@ -64,8 +64,9 @@
       <HintPath>packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PhysxNet">
-      <HintPath>I:\_DAE\Personal Work\PhysxNet\Debug\PhysxNet.dll</HintPath>
+    <Reference Include="PhysxNet, Version=1.0.6300.23007, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PhysxNet\Debug\PhysxNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=3.1.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>packages\SharpDX.3.1.1\lib\net45\SharpDX.dll</HintPath>
@@ -120,6 +121,7 @@
     <Compile Include="Graphics\Materials\DefaultForwardMaterial.cs" />
     <Compile Include="Graphics\Materials\Material.cs" />
     <Compile Include="Graphics\Materials\PhysicsDebugMaterial.cs" />
+    <Compile Include="Graphics\PhysicsDebugRenderer.cs" />
     <Compile Include="Helpers\AssimpConversions.cs" />
     <Compile Include="Helpers\BinaryReaderExtensions.cs" />
     <Compile Include="Helpers\Converters.cs" />

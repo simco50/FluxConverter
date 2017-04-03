@@ -12,9 +12,17 @@ using MahApps.Metro.Controls.Dialogs;
 using PhysxNet;
 using SharpDX;
 using System;
+using System.Runtime.InteropServices;
+
 
 namespace FluxConverterTool.Models
 {
+    public enum FLUX_VERSION : byte
+    {
+        MIN = 5,
+        MAX = 5,
+    }
+
     public class MeshConvertRequest
     {
         public Queue<FluxMesh> MeshQueue;
@@ -52,30 +60,30 @@ namespace FluxConverterTool.Models
             AssimpContext context = new AssimpContext();
             Scene scene = context.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.CalculateTangentSpace | PostProcessSteps.FlipUVs);
 
-            foreach (Mesh m in scene.Meshes)
+            Mesh m = scene.Meshes[0];
+
+            for (int i = 0; i < m.VertexCount; i++)
             {
-                for (int i = 0; i < m.VertexCount; i++)
+                if (m.HasVertices)
+                    mesh.Positions.Add(m.Vertices[i]);
+                if (m.HasNormals)
+                    mesh.Normals.Add(m.Normals[i]);
+                if (m.HasTangentBasis)
+                    mesh.Tangents.Add(m.Tangents[i]);
+                if (m.HasTextureCoords(0))
                 {
-                    if (m.HasVertices)
-                        mesh.Positions.Add(m.Vertices[i]);
-                    if (m.HasNormals)
-                        mesh.Normals.Add(m.Normals[i]);
-                    if (m.HasTangentBasis)
-                        mesh.Tangents.Add(m.Tangents[i]);
-                    if (m.HasTextureCoords(0))
-                    {
-                        Vector3D texCoord = m.TextureCoordinateChannels[0][i];
-                        mesh.UVs.Add(new Vector2D(texCoord.X, texCoord.Y));
-                    }
-                    if (m.HasVertexColors(0))
-                        mesh.VertexColors.Add(m.VertexColorChannels[0][i]);
+                    Vector3D texCoord = m.TextureCoordinateChannels[0][i];
+                    mesh.UVs.Add(new Vector2D(texCoord.X, texCoord.Y));
                 }
-                if (m.HasFaces)
-                {
-                    foreach (int index in m.GetIndices())
-                        mesh.Indices.Add(index);
-                }
+                if (m.HasVertexColors(0))
+                    mesh.VertexColors.Add(m.VertexColorChannels[0][i]);
             }
+            if (m.HasFaces)
+            {
+                foreach (int index in m.GetIndices())
+                    mesh.Indices.Add(index);
+            }
+
             DebugLog.Log($"Imported mesh '{mesh.Name}'", "Mesh Formatter");
             return mesh;
         }
@@ -102,8 +110,8 @@ namespace FluxConverterTool.Models
             worker.RunWorkerCompleted += (sender, args) =>
             {
                 exportingDialog.Close();
-                if(count > 1)
-                    ((MetroWindow) Application.Current.MainWindow).ShowMessageAsync("Export", $"Exported {count} mesh(es) successfully");
+                if (count > 1)
+                    ((MetroWindow)Application.Current.MainWindow).ShowMessageAsync("Export", $"Exported {count} mesh(es) successfully");
                 DebugLog.Log($"Exported {count} meshes", "Mesh Formatter");
             };
             worker.RunWorkerAsync(request);
@@ -112,14 +120,14 @@ namespace FluxConverterTool.Models
         private void MeshWriter_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            if (worker == null)
-                return;
+            if (worker == null) return;
+
             MeshConvertRequest request = e.Argument as MeshConvertRequest;
-            if (request == null)
-                return;
+            if (request == null) return;
 
             int meshCount = request.MeshQueue.Count;
-            int progressIncrement = 100 / meshCount / 3;
+            const int stageCount = 3;
+            int progressIncrement = 100 / meshCount / stageCount;
             int progress = 0;
             for (int i = 0; i < meshCount; i++)
             {
@@ -144,6 +152,8 @@ namespace FluxConverterTool.Models
                     worker.ReportProgress(progress, $"'{mesh.Name}' Cooking triangle mesh...");
                     WriteTriangleMeshData(mesh, stream);
                 }
+                BinaryWriter writer = new BinaryWriter(stream, Encoding.Default);
+                writer.Write("END");
                 progress += progressIncrement;
                 stream.Close();
                 DebugLog.Log($"Exported {mesh.Name}", "Mesh Formatter");
@@ -153,58 +163,64 @@ namespace FluxConverterTool.Models
         private bool WriteMesh(FluxMesh mesh, Stream stream)
         {
             BinaryWriter writer = new BinaryWriter(stream, Encoding.Default);
-            
-                writer.Write("FLUX");
-                writer.Write((char)0);
-                writer.Write((char)1);
 
-                if (mesh.WriteIndices)
-                {
-                    writer.Write("INDEX");
-                    writer.Write(mesh.Indices.Count);
-                    foreach (uint index in mesh.Indices)
-                        writer.Write(index);
-                }
+            writer.Write("FLUX");
+            writer.Write((char)FLUX_VERSION.MIN);
+            writer.Write((char)FLUX_VERSION.MAX);
 
-                if (mesh.WritePositions)
-                {
-                    writer.Write("POSITION");
-                    writer.Write(mesh.Positions.Count);
-                    foreach (Vector3D v in mesh.Positions)
-                        writer.Write(v);
-                }
+            if (mesh.WriteIndices)
+            {
+                writer.Write("INDEX");
+                writer.Write(mesh.Indices.Count);
+                writer.Write(sizeof(int));
+                foreach (uint index in mesh.Indices)
+                    writer.Write(index);
+            }
 
-                if (mesh.WriteNormals)
-                {
-                    writer.Write("NORMAL");
-                    writer.Write(mesh.Normals.Count);
-                    foreach (Vector3D v in mesh.Normals)
-                        writer.Write(v);
-                }
+            if (mesh.WritePositions)
+            {
+                writer.Write("POSITION");
+                writer.Write(mesh.Positions.Count);
+                writer.Write(Marshal.SizeOf(typeof(Vector3D)));
+                foreach (Vector3D v in mesh.Positions)
+                    writer.Write(v);
+            }
 
-                if (mesh.WriteTangents)
-                {
-                    writer.Write("TANGENT");
-                    writer.Write(mesh.Tangents.Count);
-                    foreach (Vector3D v in mesh.Tangents)
-                        writer.Write(v);
-                }
+            if (mesh.WriteNormals)
+            {
+                writer.Write("NORMAL");
+                writer.Write(mesh.Normals.Count);
+                writer.Write(Marshal.SizeOf(typeof(Vector3D)));
+                foreach (Vector3D v in mesh.Normals)
+                    writer.Write(v);
+            }
 
-                if (mesh.WriteColors)
-                {
-                    writer.Write("COLOR");
-                    writer.Write(mesh.VertexColors.Count);
-                    foreach (Color4D c in mesh.VertexColors)
-                        writer.Write(c);
-                }
+            if (mesh.WriteTangents)
+            {
+                writer.Write("TANGENT");
+                writer.Write(mesh.Tangents.Count);
+                writer.Write(Marshal.SizeOf(typeof(Vector3D)));
+                foreach (Vector3D v in mesh.Tangents)
+                    writer.Write(v);
+            }
 
-                if (mesh.WriteTexcoords)
-                {
-                    writer.Write("TEXCOORD");
-                    writer.Write(mesh.UVs.Count);
-                    foreach (Vector2D v in mesh.UVs)
-                        writer.Write(v);
-                }
+            if (mesh.WriteColors)
+            {
+                writer.Write("COLOR");
+                writer.Write(mesh.VertexColors.Count);
+                writer.Write(Marshal.SizeOf(typeof(Color4D)));
+                foreach (Color4D c in mesh.VertexColors)
+                    writer.Write(c);
+            }
+
+            if (mesh.WriteTexcoords)
+            {
+                writer.Write("TEXCOORD");
+                writer.Write(mesh.UVs.Count);
+                writer.Write(Marshal.SizeOf(typeof(Vector2D)));
+                foreach (Vector2D v in mesh.UVs)
+                    writer.Write(v);
+            }
             return true;
         }
 
@@ -215,11 +231,7 @@ namespace FluxConverterTool.Models
             try
             {
                 if (mesh.ConvexMesh == null)
-                {
-                    mesh.ConvexMesh =
-                        Cooking.CreateConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
-                    DebugLog.Log($"Cooked convex mesh for {mesh.Name}", "Mesh Formatter");
-                }
+                    LoadConvexMeshData(ref mesh);
 
             }
             catch (Exception e)
@@ -230,8 +242,15 @@ namespace FluxConverterTool.Models
 
             writer.Write("CONVEXMESH");
             writer.Write(mesh.ConvexMesh.MeshData.Count);
+            writer.Write(1);
             writer.Write(mesh.ConvexMesh.MeshData.ToArray());
             return true;
+        }
+
+        public void LoadConvexMeshData(ref FluxMesh mesh)
+        {
+            mesh.ConvexMesh = Cooking.CreateConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+            DebugLog.Log($"Cooked convex mesh for {mesh.Name}", "Mesh Formatter");
         }
 
         private bool WriteTriangleMeshData(FluxMesh mesh, Stream stream)
@@ -241,11 +260,7 @@ namespace FluxConverterTool.Models
             try
             {
                 if (mesh.TriangleMesh == null)
-                {
-                    mesh.TriangleMesh =
-                        Cooking.CreateTriangleMesh(new TriangleMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
-                    DebugLog.Log($"Cooked triangle mesh for {mesh.Name}", "Mesh Formatter");
-                }
+                    LoadTriangleMeshData(ref mesh);
             }
             catch (Exception e)
             {
@@ -255,10 +270,16 @@ namespace FluxConverterTool.Models
 
             writer.Write("TRIANGLEMESH");
             writer.Write(mesh.TriangleMesh.MeshData.Count);
+            writer.Write(1);
             writer.Write(mesh.TriangleMesh.MeshData.ToArray());
             return true;
         }
 
+        public void LoadTriangleMeshData(ref FluxMesh mesh)
+        {
+            mesh.TriangleMesh = Cooking.CreateTriangleMesh(new TriangleMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+            DebugLog.Log($"Cooked triangle mesh for {mesh.Name}", "Mesh Formatter");
+        }
     }
 
     public static class CookingExtensions
@@ -266,7 +287,7 @@ namespace FluxConverterTool.Models
         public static List<PxVec3> ToCookerVertices(this List<Vector3D> vertices)
         {
             List<PxVec3> output = new List<PxVec3>(vertices.Count);
-            foreach(Vector3D v in vertices)
+            foreach (Vector3D v in vertices)
                 output.Add(new PxVec3(v.X, v.Y, v.Z));
             return output;
         }

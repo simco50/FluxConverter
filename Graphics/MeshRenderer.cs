@@ -6,7 +6,6 @@ using FluxConverterTool.Graphics.Materials;
 using FluxConverterTool.Helpers;
 using FluxConverterTool.Models;
 using SharpDX;
-using SharpDX.D3DCompiler;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D10;
 using SharpDX.DXGI;
@@ -26,13 +25,14 @@ namespace FluxConverterTool.Graphics
     {
         private Buffer _indexBuffer;
         private Buffer _vertexBuffer;
-
         private FluxMesh _mesh;
-
         private GraphicsContext _context;
-
         private Material _defaultMaterial;
-        private Material _physicsDebugMaterial;
+
+        public MeshRenderer(GraphicsContext context)
+        {
+            _context = context;
+        }
 
         public void SetMesh(object mesh)
         {
@@ -62,15 +62,10 @@ namespace FluxConverterTool.Graphics
             }
         }
 
-        public void Initialize(GraphicsContext context)
+        public void Initialize()
         {
-            _context = context;
- 
-            _defaultMaterial = new DefaultForwardMaterial(context);
+            _defaultMaterial = new DefaultForwardMaterial(_context);
             _defaultMaterial.Initialize();
-
-            _physicsDebugMaterial = new PhysicsDebugMaterial(context);
-            _physicsDebugMaterial.Initialize();
 
             DebugLog.Log($"Initialized", "Mesh Renderer");
         }
@@ -83,7 +78,6 @@ namespace FluxConverterTool.Graphics
                 Disposer.RemoveAndDispose(ref _indexBuffer);
 
             _defaultMaterial.Shutdown();
-            _physicsDebugMaterial.Shutdown();
 
             DebugLog.Log($"Shutdown", "Mesh Renderer");
         }

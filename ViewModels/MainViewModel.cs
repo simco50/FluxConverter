@@ -322,6 +322,26 @@ namespace FluxConverterTool.ViewModels
             view.ShowDialog();
         }
 
+        public RelayCommand ShowConvexMeshCommand => new RelayCommand(ShowConvexMesh);
+
+        private void ShowConvexMesh()
+        {
+            FluxMesh mesh = _selectedMeshes[0];
+            if (mesh.ConvexMesh == null)
+                _formatter.LoadConvexMeshData(ref mesh);
+            Messenger.Default.Send<MvvmMessage>(new MvvmMessage(MessageType.PhysicsMeshUpdate, mesh.ConvexMesh));
+        }
+
+        public RelayCommand ShowTriangleMeshCommand => new RelayCommand(ShowTriangleMesh);
+
+        private void ShowTriangleMesh()
+        {
+            FluxMesh mesh = _selectedMeshes[0];
+            if(mesh.TriangleMesh == null)
+                _formatter.LoadTriangleMeshData(ref mesh);
+            Messenger.Default.Send<MvvmMessage>(new MvvmMessage(MessageType.PhysicsMeshUpdate, mesh.TriangleMesh));
+        }
+
         #endregion
     }
 }

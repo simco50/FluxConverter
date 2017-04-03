@@ -5,6 +5,7 @@
         MeshUpdate,
         MeshLoadDiffuseTexture,
         MeshLoadNormalTexture,
+        PhysicsMeshUpdate,
     }
 
     public class MvvmMessage

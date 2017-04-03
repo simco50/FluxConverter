@@ -5,6 +5,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using FluxConverterTool.Helpers;
 using FluxConverterTool.Models;
+using PhysxNet;
 using SharpDX.Direct3D10;
 
 namespace FluxConverterTool.ViewModels
@@ -26,6 +27,8 @@ namespace FluxConverterTool.ViewModels
                 Viewport.MeshRenderer.SetDiffuseTexture((string)message.Data);
             else if (message.Type == MessageType.MeshLoadNormalTexture)
                 Viewport.MeshRenderer.SetNormalTexture((string)message.Data);
+            else if(message.Type == MessageType.PhysicsMeshUpdate)
+                Viewport.PhysicsDebugRenderer.SetPhysicsMesh(message.Data as PhysicsMesh);
         }
 
         public float CameraZoom

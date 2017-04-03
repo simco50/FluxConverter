@@ -9,6 +9,7 @@ namespace FluxConverterTool.Graphics
     public class D3DViewport : IDX10Viewport
     {
         public MeshRenderer MeshRenderer;
+        public PhysicsDebugRenderer PhysicsDebugRenderer;
 
         private Grid _grid;
 
@@ -24,15 +25,19 @@ namespace FluxConverterTool.Graphics
             _grid = new Grid();
             _grid.Initialize(Context);
         
-            MeshRenderer = new MeshRenderer();
-            MeshRenderer.Initialize(Context);
-            DebugLog.Log($"Initialized", "Viewport");
+            MeshRenderer = new MeshRenderer(Context);
+            MeshRenderer.Initialize();
 
+            PhysicsDebugRenderer = new PhysicsDebugRenderer(Context);
+            PhysicsDebugRenderer.Initialize();
+
+            DebugLog.Log($"Initialized", "Viewport");
         }
 
         public void Deinitialize()
         {
             MeshRenderer.Shutdown();
+            PhysicsDebugRenderer.Shutdown();
             DebugLog.Log($"Shutdown", "Viewport");
         }
 
@@ -44,6 +49,7 @@ namespace FluxConverterTool.Graphics
         public void Render(float deltaT)
         {
             MeshRenderer.Render();
+            PhysicsDebugRenderer.Render();
             _grid.Render();
         }
     }
