@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using Assimp;
 using FluxConverterTool.Graphics.ImageControl;
+using FluxConverterTool.Graphics.Materials;
 using FluxConverterTool.Helpers;
 using FluxConverterTool.Models;
 using SharpDX;
@@ -9,6 +10,7 @@ using SharpDX.D3DCompiler;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D10;
 using SharpDX.DXGI;
+using Material = FluxConverterTool.Graphics.Materials.Material;
 
 namespace FluxConverterTool.Graphics
 {
@@ -22,10 +24,6 @@ namespace FluxConverterTool.Graphics
 
     public class MeshRenderer
     {
-        private Effect _effect;
-        private EffectTechnique _technique;
-        private InputLayout _inputLayout;
-
         private Buffer _indexBuffer;
         private Buffer _vertexBuffer;
 
@@ -33,12 +31,8 @@ namespace FluxConverterTool.Graphics
 
         private GraphicsContext _context;
 
-        private EffectMatrixVariable _worldMatrixVar;
-        private EffectMatrixVariable _wvpMatrixVar;
-        private EffectShaderResourceVariable _diffuseTextureVar;
-        private EffectScalarVariable _useDiffuseTextureVar;
-        private EffectShaderResourceVariable _normalTextureVar;
-        private EffectScalarVariable _useNormalTextureVar;
+        private Material _defaultMaterial;
+        private Material _physicsDebugMaterial;
 
         public void SetMesh(object mesh)
         {
@@ -71,35 +65,14 @@ namespace FluxConverterTool.Graphics
         public void Initialize(GraphicsContext context)
         {
             _context = context;
-            LoadShader();
+ 
+            _defaultMaterial = new DefaultForwardMaterial(context);
+            _defaultMaterial.Initialize();
+
+            _physicsDebugMaterial = new PhysicsDebugMaterial(context);
+            _physicsDebugMaterial.Initialize();
 
             DebugLog.Log($"Initialized", "Mesh Renderer");
-        }
-
-        void LoadShader()
-        {
-            CompilationResult result = ShaderBytecode.CompileFromFile("./Resources/Shaders/Default_Forward.fx", "fx_4_0");
-            if (result.HasErrors)
-                return;
-            _effect = new Effect(_context.Device, result.Bytecode);
-            _technique = _effect.GetTechniqueByIndex(0);
-
-            _useDiffuseTextureVar = _effect.GetVariableByName("gUseDiffuseTexture").AsScalar();
-            _diffuseTextureVar = _effect.GetVariableByName("gDiffuseTexture").AsShaderResource();
-            _useNormalTextureVar = _effect.GetVariableByName("gUseNormalTexture").AsScalar();
-            _normalTextureVar = _effect.GetVariableByName("gNormalTexture").AsShaderResource();
-            _wvpMatrixVar = _effect.GetVariableBySemantic("WORLDVIEWPROJECTION").AsMatrix();
-            _worldMatrixVar = _effect.GetVariableBySemantic("WORLD").AsMatrix();
-
-            InputElement[] vertexLayout =
-            {
-                new InputElement("POSITION", 0, Format.R32G32B32_Float, 0, 0, InputClassification.PerVertexData, 0),
-                new InputElement("TEXCOORD", 0, Format.R32G32_Float, 12, 0, InputClassification.PerVertexData, 0),
-                new InputElement("NORMAL", 0, Format.R32G32B32_Float, 20, 0, InputClassification.PerVertexData, 0),
-                new InputElement("TANGENT", 0, Format.R32G32B32_Float, 32, 0, InputClassification.PerVertexData, 0),
-            };
-            _inputLayout = new InputLayout(_context.Device, _technique.GetPassByIndex(0).Description.Signature,
-                vertexLayout);
         }
 
         public void Shutdown()
@@ -108,10 +81,9 @@ namespace FluxConverterTool.Graphics
                 Disposer.RemoveAndDispose(ref _vertexBuffer);
             if (_indexBuffer != null)
                 Disposer.RemoveAndDispose(ref _indexBuffer);
-            if (_effect != null)
-                Disposer.RemoveAndDispose(ref _effect);
-            if(_inputLayout != null)
-                Disposer.RemoveAndDispose(ref _inputLayout);
+
+            _defaultMaterial.Shutdown();
+            _physicsDebugMaterial.Shutdown();
 
             DebugLog.Log($"Shutdown", "Mesh Renderer");
         }
@@ -165,25 +137,18 @@ namespace FluxConverterTool.Graphics
             if (_mesh == null)
                 return;
 
-            _context.Device.InputAssembler.InputLayout = _inputLayout;
+            _context.Device.InputAssembler.InputLayout = _defaultMaterial.InputLayout;
             _context.Device.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R32_UInt, 0);
             _context.Device.InputAssembler.SetVertexBuffers(0,
                 new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNormTanTex)), 0));
             _context.Device.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-            _wvpMatrixVar.SetMatrix(Matrix.Identity * _context.Camera.ViewProjectionMatrix);
-            _worldMatrixVar.SetMatrix(Matrix.Identity);
-            _useDiffuseTextureVar.Set(_mesh.DiffuseTexture != null);
-            if (_mesh.DiffuseTexture != null)
-                _diffuseTextureVar.SetResource(_mesh.DiffuseTexture);
-            _useNormalTextureVar.Set(_mesh.NormalTexture != null);
-            if (_mesh.NormalTexture != null)
-                _normalTextureVar.SetResource(_mesh.NormalTexture);
+            _defaultMaterial.UpdateShaderVariables(_mesh);
 
-            EffectTechniqueDescription desc = _technique.Description;
+            EffectTechniqueDescription desc = _defaultMaterial.Technique.Description;
             for (int i = 0; i < desc.PassCount; i++)
             {
-                _technique.GetPassByIndex(i).Apply();
+                _defaultMaterial.Technique.GetPassByIndex(i).Apply();
                 _context.Device.DrawIndexed(_mesh.Indices.Count, 0, 0);
             }
         }
