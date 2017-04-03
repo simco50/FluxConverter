@@ -57,18 +57,18 @@ namespace FluxConverterTool.Models
                 for (int i = 0; i < m.VertexCount; i++)
                 {
                     if (m.HasVertices)
-                        mesh.Positions.Add(m.Vertices[i].ToVector3());
+                        mesh.Positions.Add(m.Vertices[i]);
                     if (m.HasNormals)
-                        mesh.Normals.Add(m.Normals[i].ToVector3());
+                        mesh.Normals.Add(m.Normals[i]);
                     if (m.HasTangentBasis)
-                        mesh.Tangents.Add(m.Tangents[i].ToVector3());
+                        mesh.Tangents.Add(m.Tangents[i]);
                     if (m.HasTextureCoords(0))
                     {
-                        Vector3 texCoord = m.TextureCoordinateChannels[0][i].ToVector3();
-                        mesh.UVs.Add(new Vector2(texCoord.X, texCoord.Y));
+                        Vector3D texCoord = m.TextureCoordinateChannels[0][i];
+                        mesh.UVs.Add(new Vector2D(texCoord.X, texCoord.Y));
                     }
                     if (m.HasVertexColors(0))
-                        mesh.VertexColors.Add(m.VertexColorChannels[0][i].ToColor());
+                        mesh.VertexColors.Add(m.VertexColorChannels[0][i]);
                 }
                 if (m.HasFaces)
                 {
@@ -76,9 +76,7 @@ namespace FluxConverterTool.Models
                         mesh.Indices.Add(index);
                 }
             }
-
             DebugLog.Log($"Imported mesh '{mesh.Name}'", "Mesh Formatter");
-
             return mesh;
         }
 
@@ -172,7 +170,7 @@ namespace FluxConverterTool.Models
                 {
                     writer.Write("POSITION");
                     writer.Write(mesh.Positions.Count);
-                    foreach (Vector3 v in mesh.Positions)
+                    foreach (Vector3D v in mesh.Positions)
                         writer.Write(v);
                 }
 
@@ -180,7 +178,7 @@ namespace FluxConverterTool.Models
                 {
                     writer.Write("NORMAL");
                     writer.Write(mesh.Normals.Count);
-                    foreach (Vector3 v in mesh.Normals)
+                    foreach (Vector3D v in mesh.Normals)
                         writer.Write(v);
                 }
 
@@ -188,7 +186,7 @@ namespace FluxConverterTool.Models
                 {
                     writer.Write("TANGENT");
                     writer.Write(mesh.Tangents.Count);
-                    foreach (Vector3 v in mesh.Tangents)
+                    foreach (Vector3D v in mesh.Tangents)
                         writer.Write(v);
                 }
 
@@ -196,7 +194,7 @@ namespace FluxConverterTool.Models
                 {
                     writer.Write("COLOR");
                     writer.Write(mesh.VertexColors.Count);
-                    foreach (Color c in mesh.VertexColors)
+                    foreach (Color4D c in mesh.VertexColors)
                         writer.Write(c);
                 }
 
@@ -204,7 +202,7 @@ namespace FluxConverterTool.Models
                 {
                     writer.Write("TEXCOORD");
                     writer.Write(mesh.UVs.Count);
-                    foreach (Vector2 v in mesh.UVs)
+                    foreach (Vector2D v in mesh.UVs)
                         writer.Write(v);
                 }
             return true;
@@ -265,10 +263,10 @@ namespace FluxConverterTool.Models
 
     public static class CookingExtensions
     {
-        public static List<PxVec3> ToCookerVertices(this List<Vector3> vertices)
+        public static List<PxVec3> ToCookerVertices(this List<Vector3D> vertices)
         {
             List<PxVec3> output = new List<PxVec3>(vertices.Count);
-            foreach(Vector3 v in vertices)
+            foreach(Vector3D v in vertices)
                 output.Add(new PxVec3(v.X, v.Y, v.Z));
             return output;
         }

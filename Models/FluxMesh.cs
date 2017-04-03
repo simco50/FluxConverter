@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SharpDX;
+using Assimp;
 using GalaSoft.MvvmLight;
 using PhysxNet;
 using SharpDX.Direct3D10;
@@ -8,12 +8,21 @@ namespace FluxConverterTool.Models
 {
     public class FluxMesh : ObservableObject
     {
-        public List<Vector3> Positions { get; set; } = new List<Vector3>();
+        #region DATA
+
+        public List<Vector3D> Positions { get; set; } = new List<Vector3D>();
         public List<int> Indices { get; set; } = new List<int>();
-        public List<Vector3> Normals { get; set; } = new List<Vector3>();
-        public List<Vector3> Tangents { get; set; } = new List<Vector3>();
-        public List<Vector2> UVs { get; set; } = new List<Vector2>();
-        public List<Color> VertexColors { get; set; } = new List<Color>();
+        public List<Vector3D> Normals { get; set; } = new List<Vector3D>();
+        public List<Vector3D> Tangents { get; set; } = new List<Vector3D>();
+        public List<Vector2D> UVs { get; set; } = new List<Vector2D>();
+        public List<Color4D> VertexColors { get; set; } = new List<Color4D>();
+
+        public PhysicsMesh ConvexMesh { get; set; } = null;
+        public PhysicsMesh TriangleMesh { get; set; } = null;
+
+        #endregion
+
+        #region MODEL PROPERTIES
 
         public string Name { get; set; }
 
@@ -38,14 +47,11 @@ namespace FluxConverterTool.Models
         public bool CookTriangleMesh { get; set; } = false;
         public bool CookConvexMesh { get; set; } = false;
 
-        public bool IsSelected { get; set; } = false;
-
         public bool HasAnimations => false;
-
-        public PhysicsMesh ConvexMesh { get; set; } = null;
-        public PhysicsMesh TriangleMesh { get; set; } = null;
 
         public ShaderResourceView DiffuseTexture = null;
         public ShaderResourceView NormalTexture = null;
+
+        #endregion
     }
 }

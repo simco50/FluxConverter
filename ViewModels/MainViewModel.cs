@@ -248,7 +248,7 @@ namespace FluxConverterTool.ViewModels
         void ImportMeshes()
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "Meshes (*.obj;*.dae;*.3ds)|*.obj;*.dae;*.3ds";
+            dialog.Filter = "Meshes (*.obj;*.dae;*.3ds;*.x)|*.obj;*.dae;*.3ds;*.x";
             dialog.Multiselect = true;
             if (dialog.ShowDialog() == false)
                 return;

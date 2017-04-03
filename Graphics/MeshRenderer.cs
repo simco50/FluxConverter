@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Assimp;
 using FluxConverterTool.Graphics.ImageControl;
 using FluxConverterTool.Helpers;
 using FluxConverterTool.Models;
@@ -13,10 +14,10 @@ namespace FluxConverterTool.Graphics
 {
     public struct VertexPosNormTanTex
     {
-        public Vector3 Position;
-        public Vector2 TexCoord;
-        public Vector3 Normal;
-        public Vector3 Tangent;
+        public Vector3D Position;
+        public Vector2D TexCoord;
+        public Vector3D Normal;
+        public Vector3D Tangent;
     }
 
     public class MeshRenderer
@@ -51,7 +52,7 @@ namespace FluxConverterTool.Graphics
         {
             if (_mesh != null)
             {
-                if(_mesh.DiffuseTexture != null)
+                if (_mesh.DiffuseTexture != null)
                     _mesh.DiffuseTexture.Dispose();
                 _mesh.DiffuseTexture = ShaderResourceView.FromFile(_context.Device, filePath);
             }
@@ -70,7 +71,13 @@ namespace FluxConverterTool.Graphics
         public void Initialize(GraphicsContext context)
         {
             _context = context;
+            LoadShader();
 
+            DebugLog.Log($"Initialized", "Mesh Renderer");
+        }
+
+        void LoadShader()
+        {
             CompilationResult result = ShaderBytecode.CompileFromFile("./Resources/Shaders/Default_Forward.fx", "fx_4_0");
             if (result.HasErrors)
                 return;
@@ -91,9 +98,8 @@ namespace FluxConverterTool.Graphics
                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 20, 0, InputClassification.PerVertexData, 0),
                 new InputElement("TANGENT", 0, Format.R32G32B32_Float, 32, 0, InputClassification.PerVertexData, 0),
             };
-            _inputLayout = new InputLayout(_context.Device, _technique.GetPassByIndex(0).Description.Signature, vertexLayout);
-
-            DebugLog.Log($"Initialized", "Mesh Renderer");
+            _inputLayout = new InputLayout(_context.Device, _technique.GetPassByIndex(0).Description.Signature,
+                vertexLayout);
         }
 
         public void Shutdown()
@@ -102,16 +108,19 @@ namespace FluxConverterTool.Graphics
                 Disposer.RemoveAndDispose(ref _vertexBuffer);
             if (_indexBuffer != null)
                 Disposer.RemoveAndDispose(ref _indexBuffer);
-            if(_effect != null)
+            if (_effect != null)
                 Disposer.RemoveAndDispose(ref _effect);
+            if(_inputLayout != null)
+                Disposer.RemoveAndDispose(ref _inputLayout);
+
             DebugLog.Log($"Shutdown", "Mesh Renderer");
         }
 
         void CreateBuffers()
         {
-            if(_vertexBuffer != null)
+            if (_vertexBuffer != null)
                 Disposer.RemoveAndDispose(ref _vertexBuffer);
-            if(_indexBuffer != null)
+            if (_indexBuffer != null)
                 Disposer.RemoveAndDispose(ref _indexBuffer);
 
             BufferDescription desc = new BufferDescription();
@@ -134,7 +143,7 @@ namespace FluxConverterTool.Graphics
             for (int i = 0; i < _mesh.Positions.Count; i++)
             {
                 VertexPosNormTanTex vertex = new VertexPosNormTanTex();
-                if(_mesh.Positions.Count != 0)
+                if (_mesh.Positions.Count != 0)
                     vertex.Position = _mesh.Positions[i];
                 if (_mesh.Normals.Count != 0)
                     vertex.Normal = _mesh.Normals[i];
@@ -158,16 +167,17 @@ namespace FluxConverterTool.Graphics
 
             _context.Device.InputAssembler.InputLayout = _inputLayout;
             _context.Device.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R32_UInt, 0);
-            _context.Device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNormTanTex)), 0));
+            _context.Device.InputAssembler.SetVertexBuffers(0,
+                new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNormTanTex)), 0));
             _context.Device.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
             _wvpMatrixVar.SetMatrix(Matrix.Identity * _context.Camera.ViewProjectionMatrix);
             _worldMatrixVar.SetMatrix(Matrix.Identity);
             _useDiffuseTextureVar.Set(_mesh.DiffuseTexture != null);
-            if(_mesh.DiffuseTexture != null)
+            if (_mesh.DiffuseTexture != null)
                 _diffuseTextureVar.SetResource(_mesh.DiffuseTexture);
             _useNormalTextureVar.Set(_mesh.NormalTexture != null);
-            if(_mesh.NormalTexture != null)
+            if (_mesh.NormalTexture != null)
                 _normalTextureVar.SetResource(_mesh.NormalTexture);
 
             EffectTechniqueDescription desc = _technique.Description;
