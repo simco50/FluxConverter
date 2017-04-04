@@ -11,8 +11,9 @@ namespace PhysxNetTestProject
         static void Main(string[] args)
         {
             Foundation foundation = new Foundation();
-            Physics physics = new Physics(foundation);
-            Cooking cooking = new Cooking(foundation, physics);
+            Physics physics = new Physics(foundation, new ToleranceScale(1.0f, 9.81f, 1.0f));
+            CookingParams cookingParams = new CookingParams(new ToleranceScale(1.0f,9.81f,1.0f));
+            Cooking cooking = new Cooking(foundation, physics, cookingParams);
 
             List<PxVec3> vertices = new List<PxVec3>() {
                 new PxVec3 (0, 0, 0),

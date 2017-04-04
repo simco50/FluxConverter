@@ -4,6 +4,11 @@
 
 namespace PhysxNet
 {
+	CookingParams::CookingParams():
+		CookingParams::CookingParams(gcnew ToleranceScale())
+	{
+	}
+
 
 	CookingParams::CookingParams(ToleranceScale^ toleranceScale):
 		m_pToleranceScale(toleranceScale)
@@ -15,8 +20,9 @@ namespace PhysxNet
 	{
 		physx::PxCookingParams params(m_pToleranceScale->ToUnmanaged());
 		params.convexMeshCookingType = physx::PxConvexMeshCookingType::eQUICKHULL;
-		params.meshPreprocessParams = static_cast<physx::PxMeshPreprocessingFlags>(static_cast<int>(MeshPreprocessingFlags));
+		params.meshPreprocessParams = static_cast<physx::PxMeshPreprocessingFlag::Enum>(MeshPreprocessingFlags);
 		params.meshWeldTolerance = MeshWeldTolerance;
+		params.meshCookingHint = static_cast<physx::PxMeshCookingHint::Enum>(MeshCookingHint);
 		return params;
 	}
 

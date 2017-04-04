@@ -8,19 +8,20 @@
 #include "Physics.h"
 #include "PhysicsMesh.h"
 #include "PhysicsStreams.h"
+#include "CookingParams.h"
 
 namespace PhysxNet
 {
 	Cooking::Cooking(Foundation^ pFoundation, Physics^ pPhysics) :
-		Cooking::Cooking(pFoundation, pPhysics, gcnew ToleranceScale())
+		Cooking::Cooking(pFoundation, pPhysics, gcnew CookingParams())
 	{
 		
 	}
 
-	Cooking::Cooking(Foundation ^ pFoundation, Physics^ pPhysics, ToleranceScale ^ ToleranceScale) :
-		m_pFoundation(pFoundation), m_pPhysics(pPhysics)
+	Cooking::Cooking(Foundation ^ pFoundation, Physics^ pPhysics, CookingParams^ pCookingParams) :
+		m_pPhysics(pPhysics)
 	{
-		physx::PxCookingParams params(ToleranceScale->ToUnmanaged());
+		physx::PxCookingParams params = pCookingParams->ToUnmanaged();
 
 		params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eFORCE_32BIT_INDICES;
 		params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eWELD_VERTICES;

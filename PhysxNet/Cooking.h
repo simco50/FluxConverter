@@ -14,7 +14,7 @@ namespace PhysxNet
 	{
 	public:
 		Cooking(Foundation^ pFoundation, Physics^ pPhysics);
-		Cooking(Foundation ^ pFoundation, Physics^ pPhysics, ToleranceScale ^ ToleranceScale);
+		Cooking(Foundation ^ pFoundation, Physics^ pPhysics, CookingParams^ pCookingParams);
 		void Release();
 
 		PhysicsMesh^ CreateConvexMesh(ConvexMeshDesc^ desc);
@@ -23,7 +23,6 @@ namespace PhysxNet
 	private:
 
 		physx::PxCooking* m_pCookingUnmanaged = nullptr;
-		Foundation^ m_pFoundation;
 		Physics^ m_pPhysics;
 	};
 

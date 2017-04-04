@@ -74,8 +74,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\References\Nvidia PhysX\PhysX 3.4\PxShared\include;D:\References\Nvidia PhysX\PhysX 3.4\PhysX_3.4\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\References\Nvidia PhysX\PhysX 3.4\PxShared\Lib\vc14win32\;D:\References\Nvidia PhysX\PhysX 3.4\PhysX_3.4\Lib\vc14win32\;$(LibraryPath)</LibraryPath>
+    <IncludePath>I:\_DAE\References\Nvidia PhysX\PhysX 3.4\PxShared\include;I:\_DAE\References\Nvidia PhysX\PhysX 3.4\PhysX_3.4\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>I:\_DAE\References\Nvidia PhysX\PhysX 3.4\PxShared\Lib\vc14win32\;I:\_DAE\References\Nvidia PhysX\PhysX 3.4\PhysX_3.4\Lib\vc14win32\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -83,8 +83,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\References\Nvidia PhysX\PhysX 3.4\PxShared\include;D:\References\Nvidia PhysX\PhysX 3.4\PhysX_3.4\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\References\Nvidia PhysX\PhysX 3.4\PxShared\Lib\vc14win32\;D:\References\Nvidia PhysX\PhysX 3.4\PhysX_3.4\Lib\vc14win32\;$(LibraryPath)</LibraryPath>
+    <IncludePath>I:\_DAE\References\Nvidia PhysX\PhysX 3.4\PxShared\include;I:\_DAE\References\Nvidia PhysX\PhysX 3.4\PhysX_3.4\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>I:\_DAE\References\Nvidia PhysX\PhysX 3.4\PxShared\Lib\vc14win32\;I:\_DAE\References\Nvidia PhysX\PhysX 3.4\PhysX_3.4\Lib\vc14win32\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -1,17 +1,20 @@
 #include "stdafx.h"
 #include "Physics.h"
 #include "Foundation.h"
+#include "ToleranceScale.h"
 
 namespace PhysxNet
 {
 	Physics::Physics(Foundation^ pFoundation):
+		Physics::Physics(pFoundation, gcnew ToleranceScale())
+	{
+	
+	}
+
+	Physics::Physics(Foundation^ pFoundation, ToleranceScale^ pToleranceScale):
 		m_pFoundation(pFoundation)
 	{
-		physx::PxTolerancesScale scale;
-		scale.mass = 1.0f;
-		scale.speed = 9.81f;
-		scale.length = 1.0f;
-		m_pPhysicsUnmanaged = PxCreatePhysics(PX_PHYSICS_VERSION, *pFoundation->GetUnmanaged(), scale);
+		m_pPhysicsUnmanaged = PxCreatePhysics(PX_PHYSICS_VERSION, *pFoundation->GetUnmanaged(), pToleranceScale->ToUnmanaged());
 		if (m_pPhysicsUnmanaged == nullptr)
 			throw gcnew System::Exception("Failed to create physics!");
 	}
