@@ -14,7 +14,7 @@ namespace FluxConverterTool.Models
         public List<int> Indices { get; set; } = new List<int>();
         public List<Vector3D> Normals { get; set; } = new List<Vector3D>();
         public List<Vector3D> Tangents { get; set; } = new List<Vector3D>();
-        public List<Vector2D> UVs { get; set; } = new List<Vector2D>();
+        public List<Vector2D> TexCoords { get; set; } = new List<Vector2D>();
         public List<Color4D> VertexColors { get; set; } = new List<Color4D>();
 
         public PhysicsMesh ConvexMesh { get; set; } = null;
@@ -39,7 +39,7 @@ namespace FluxConverterTool.Models
         public bool WriteTangents { get { return _writeTangents && Tangents.Count > 0; } set { _writeTangents = value; } }
 
         private bool _writeTexcoords = false;
-        public bool WriteTexcoords { get { return _writeTexcoords && UVs.Count > 0; } set { _writeTexcoords = value; } }
+        public bool WriteTexcoords { get { return _writeTexcoords && TexCoords.Count > 0; } set { _writeTexcoords = value; } }
 
         private bool _writeColors = false;
         public bool WriteColors { get { return _writeColors && VertexColors.Count > 0; } set { _writeColors = value; } }

@@ -33,7 +33,7 @@ namespace FluxConverterTool.ViewModels
         public int SelectedMeshCount => _selectedMeshes.Count;
 
         public bool IsSingleSelected => _selectedMeshes.Count == 1;
-        public bool EnableLoadDiffuseTextureButton => IsSingleSelected && _selectedMeshes[0].UVs.Count > 0;
+        public bool EnableLoadDiffuseTextureButton => IsSingleSelected && _selectedMeshes[0].TexCoords.Count > 0;
         public bool EnableLoadNormalTextureButton => IsSingleSelected && _selectedMeshes[0].Normals.Count > 0 && _selectedMeshes[0].Tangents.Count > 0;
         public bool EnableAnimationSection => IsSingleSelected && _selectedMeshes[0].HasAnimations;
 
@@ -45,7 +45,7 @@ namespace FluxConverterTool.ViewModels
         public bool EnableIndices => false;
         public bool EnableNormals => _selectedMeshes.Count(mesh => mesh.Normals.Count > 0) == _selectedMeshes.Count;
         public bool EnableTangents => _selectedMeshes.Count(mesh => mesh.Tangents.Count > 0) == _selectedMeshes.Count;
-        public bool EnableUVs => _selectedMeshes.Count(mesh => mesh.UVs.Count > 0) == _selectedMeshes.Count;
+        public bool EnableUVs => _selectedMeshes.Count(mesh => mesh.TexCoords.Count > 0) == _selectedMeshes.Count;
         public bool EnableColors => _selectedMeshes.Count(mesh => mesh.VertexColors.Count > 0) == _selectedMeshes.Count;
 
         public bool WritePositions

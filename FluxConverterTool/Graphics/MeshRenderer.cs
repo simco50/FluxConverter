@@ -34,9 +34,11 @@ namespace FluxConverterTool.Graphics
             _context = context;
         }
 
-        public void SetMesh(object mesh)
+        public void SetMesh(FluxMesh mesh)
         {
-            _mesh = mesh as FluxMesh;
+            if (mesh == _mesh)
+                return;
+            _mesh = mesh;
             if (_mesh == null)
                 return;
             CreateBuffers();
@@ -105,25 +107,23 @@ namespace FluxConverterTool.Graphics
             desc.Usage = ResourceUsage.Default;
             desc.CpuAccessFlags = CpuAccessFlags.None;
 
-            List<VertexPosNormTanTex> vertices = new List<VertexPosNormTanTex>();
+            VertexPosNormTanTex[] vertices = new VertexPosNormTanTex[_mesh.Positions.Count];
             for (int i = 0; i < _mesh.Positions.Count; i++)
             {
-                VertexPosNormTanTex vertex = new VertexPosNormTanTex();
-                if (_mesh.Positions.Count != 0)
-                    vertex.Position = _mesh.Positions[i];
-                if (_mesh.Normals.Count != 0)
-                    vertex.Normal = _mesh.Normals[i];
-                if (_mesh.UVs.Count != 0)
-                    vertex.TexCoord = _mesh.UVs[i];
-                if (_mesh.Tangents.Count != 0)
-                    vertex.Tangent = _mesh.Tangents[i];
-                vertices.Add(vertex);
+                if(i < _mesh.Positions.Count)
+                    vertices[i].Position = _mesh.Positions[i];
+                if(i < _mesh.Normals.Count)
+                    vertices[i].Normal = _mesh.Normals[i];
+                if(i < _mesh.TexCoords.Count)
+                    vertices[i].TexCoord = _mesh.TexCoords[i];
+                if(i < _mesh.Tangents.Count)
+                    vertices[i].Tangent = _mesh.Tangents[i];
             }
 
-            stream = DataStream.Create(vertices.ToArray(), false, false);
+            stream = DataStream.Create(vertices, false, false);
             _vertexBuffer = new Buffer(_context.Device, stream, desc);
 
-            DebugLog.Log($"Buffers initialized", "Mesh Renderer");
+            DebugLog.Log($"Buffers initialized for mesh '{_mesh.Name}'", "Mesh Renderer");
         }
 
         public void Render()
@@ -133,8 +133,7 @@ namespace FluxConverterTool.Graphics
 
             _context.Device.InputAssembler.InputLayout = _defaultMaterial.InputLayout;
             _context.Device.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R32_UInt, 0);
-            _context.Device.InputAssembler.SetVertexBuffers(0,
-                new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNormTanTex)), 0));
+            _context.Device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNormTanTex)), 0));
             _context.Device.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
             _defaultMaterial.UpdateShaderVariables(_mesh);

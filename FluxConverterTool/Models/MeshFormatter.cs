@@ -73,7 +73,7 @@ namespace FluxConverterTool.Models
                 if (m.HasTextureCoords(0))
                 {
                     Vector3D texCoord = m.TextureCoordinateChannels[0][i];
-                    mesh.UVs.Add(new Vector2D(texCoord.X, texCoord.Y));
+                    mesh.TexCoords.Add(new Vector2D(texCoord.X, texCoord.Y));
                 }
                 if (m.HasVertexColors(0))
                     mesh.VertexColors.Add(m.VertexColorChannels[0][i]);
@@ -216,9 +216,9 @@ namespace FluxConverterTool.Models
             if (mesh.WriteTexcoords)
             {
                 writer.Write("TEXCOORD");
-                writer.Write(mesh.UVs.Count);
+                writer.Write(mesh.TexCoords.Count);
                 writer.Write(Marshal.SizeOf(typeof(Vector2D)));
-                foreach (Vector2D v in mesh.UVs)
+                foreach (Vector2D v in mesh.TexCoords)
                     writer.Write(v);
             }
             return true;

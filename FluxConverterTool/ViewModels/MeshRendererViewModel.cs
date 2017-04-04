@@ -22,7 +22,7 @@ namespace FluxConverterTool.ViewModels
         void OnMessageReceived(MvvmMessage message)
         {
             if (message.Type == MessageType.MeshUpdate)
-                Viewport.MeshRenderer.SetMesh(message.Data);
+                Viewport.MeshRenderer.SetMesh(message.Data as FluxMesh);
             else if (message.Type == MessageType.MeshLoadDiffuseTexture)
                 Viewport.MeshRenderer.SetDiffuseTexture((string)message.Data);
             else if (message.Type == MessageType.MeshLoadNormalTexture)

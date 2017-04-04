@@ -23,9 +23,8 @@
     <controls:MetroWindow.DataContext>
         <viewModels:MainViewModel/>
     </controls:MetroWindow.DataContext>
-    
-    <Grid>
 
+    <Grid>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
