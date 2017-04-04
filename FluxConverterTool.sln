@@ -3,18 +3,56 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluxConverterTool", "FluxConverterTool.csproj", "{03B28A5B-D287-45D9-953D-2C8ACE90DD83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluxConverterTool", "FluxConverterTool\FluxConverterTool.csproj", "{03B28A5B-D287-45D9-953D-2C8ACE90DD83}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysxNet", "PhysxNet\PhysxNet.vcxproj", "{73701D37-5727-41F7-AB90-EC2139C110F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysxNetTestProject", "PhysxNetTestProject\PhysxNetTestProject.csproj", "{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Debug|x64.Build.0 = Debug|Any CPU
+		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Debug|x86.Build.0 = Debug|Any CPU
 		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Release|x64.ActiveCfg = Release|Any CPU
+		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Release|x64.Build.0 = Release|Any CPU
+		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Release|x86.ActiveCfg = Release|Any CPU
+		{03B28A5B-D287-45D9-953D-2C8ACE90DD83}.Release|x86.Build.0 = Release|Any CPU
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Debug|x64.ActiveCfg = Debug|x64
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Debug|x64.Build.0 = Debug|x64
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Debug|x86.ActiveCfg = Debug|Win32
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Debug|x86.Build.0 = Debug|Win32
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Release|Any CPU.ActiveCfg = Release|Win32
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Release|x64.ActiveCfg = Release|x64
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Release|x64.Build.0 = Release|x64
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Release|x86.ActiveCfg = Release|Win32
+		{73701D37-5727-41F7-AB90-EC2139C110F2}.Release|x86.Build.0 = Release|Win32
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Debug|x64.Build.0 = Debug|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Debug|x86.Build.0 = Debug|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Release|x64.ActiveCfg = Release|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Release|x64.Build.0 = Release|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Release|x86.ActiveCfg = Release|Any CPU
+		{5D60BAF8-1DEF-4A02-BF3E-190B73185E8E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

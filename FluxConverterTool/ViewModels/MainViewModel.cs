@@ -193,6 +193,7 @@ namespace FluxConverterTool.ViewModels
 
             ProperyChanged();
             Messenger.Default.Send<MvvmMessage, MeshRendererViewModel>(new MvvmMessage(MessageType.MeshUpdate, _selectedMeshes.Count > 0 ? _selectedMeshes[0] : null));
+            Messenger.Default.Send<MvvmMessage, MeshRendererViewModel>(new MvvmMessage(MessageType.PhysicsMeshUpdate, null));
         }
 
         private void ProperyChanged()

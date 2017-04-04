@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{80bb2f8c-a22c-4fbb-a697-19ae561b1161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CookingParams">
+      <UniqueIdentifier>{e2ee3a7e-3e8c-4546-b36d-0495fc9627a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{d76be79b-442e-4dc3-9506-212c5b57da37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cooking">
+      <UniqueIdentifier>{b0d50b19-8656-4882-b47f-efa9277d8ffb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Physics.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Foundation.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Cooking.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleMeshDesc.h">
+      <Filter>CookingParams</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexMeshDesc.h">
+      <Filter>CookingParams</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsMesh.h">
+      <Filter>Cooking</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsStreams.h">
+      <Filter>Cooking</Filter>
+    </ClInclude>
+    <ClInclude Include="ToleranceScale.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CookingParams.h">
+      <Filter>CookingParams</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Physics.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Foundation.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Cooking.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="TriangleMeshDesc.cpp">
+      <Filter>CookingParams</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvexMeshDesc.cpp">
+      <Filter>CookingParams</Filter>
+    </ClCompile>
+    <ClCompile Include="ToleranceScale.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CookingParams.cpp">
+      <Filter>CookingParams</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

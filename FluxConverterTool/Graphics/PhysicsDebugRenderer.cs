@@ -54,6 +54,8 @@ namespace FluxConverterTool.Graphics
             if (mesh == _physicsMesh)
                 return;
             _physicsMesh = mesh;
+            if (_physicsMesh == null)
+                return;
             CreateBuffers();
         }
 
