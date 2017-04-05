@@ -133,29 +133,32 @@ namespace FluxConverterTool.Models
             {
                 FluxMesh mesh = request.MeshQueue.Dequeue();
 
-                string filePath = $"{request.SaveDirectory}\\{mesh.Name}.flux";
-                FileStream stream = File.Create(filePath);
+                string filePath = $"{request.SaveDirectory}\\{mesh.Name}";
+                FileStream stream = File.Create($"{filePath}.flux");
 
                 worker.ReportProgress(progress, $"'{mesh.Name}' Writing mesh data...");
                 WriteMesh(mesh, stream);
                 progress += progressIncrement;
-
-                if (mesh.CookConvexMesh)
-                {
-                    worker.ReportProgress(progress, $"'{mesh.Name}' Cooking convex mesh...");
-                    WriteConvexMeshData(mesh, stream);
-                }
-                progress += progressIncrement;
-
-                if (mesh.CookTriangleMesh)
-                {
-                    worker.ReportProgress(progress, $"'{mesh.Name}' Cooking triangle mesh...");
-                    WriteTriangleMeshData(mesh, stream);
-                }
-                BinaryWriter writer = new BinaryWriter(stream, Encoding.Default);
-                writer.Write("END");
-                progress += progressIncrement;
                 stream.Close();
+                if (mesh.CookConvexMesh || mesh.CookTriangleMesh)
+                {
+                    stream = File.Create($"{filePath}.collision");
+                    if (mesh.CookConvexMesh)
+                    {
+                        worker.ReportProgress(progress, $"'{mesh.Name}' Cooking convex mesh...");
+                        WriteConvexMeshData(mesh, stream);
+                    }
+                    progress += progressIncrement;
+
+                    if (mesh.CookTriangleMesh)
+                    {
+                        worker.ReportProgress(progress, $"'{mesh.Name}' Cooking triangle mesh...");
+                        WriteTriangleMeshData(mesh, stream);
+                    }
+                    stream.Close();
+                }
+                progress += progressIncrement;
+
                 DebugLog.Log($"Exported {mesh.Name}", "Mesh Formatter");
             }
         }
@@ -221,6 +224,7 @@ namespace FluxConverterTool.Models
                 foreach (Vector2D v in mesh.TexCoords)
                     writer.Write(v);
             }
+            writer.Write("END");
             return true;
         }
 
@@ -242,7 +246,6 @@ namespace FluxConverterTool.Models
 
             writer.Write("CONVEXMESH");
             writer.Write(mesh.ConvexMesh.MeshData.Count);
-            writer.Write(1);
             writer.Write(mesh.ConvexMesh.MeshData.ToArray());
             return true;
         }
@@ -270,7 +273,6 @@ namespace FluxConverterTool.Models
 
             writer.Write("TRIANGLEMESH");
             writer.Write(mesh.TriangleMesh.MeshData.Count);
-            writer.Write(1);
             writer.Write(mesh.TriangleMesh.MeshData.ToArray());
             return true;
         }

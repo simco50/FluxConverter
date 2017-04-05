@@ -138,7 +138,7 @@
     <Compile Include="Graphics\Materials\PhysicsDebugMaterial.cs" />
     <Compile Include="Graphics\PhysicsDebugRenderer.cs" />
     <Compile Include="Helpers\AssimpConversions.cs" />
-    <Compile Include="Helpers\BinaryReaderExtensions.cs" />
+    <Compile Include="Helpers\BinaryWriterExtensions.cs" />
     <Compile Include="Helpers\Converters.cs" />
     <Compile Include="Helpers\DebugLog.cs" />
     <Compile Include="Helpers\MvvmMessage.cs" />

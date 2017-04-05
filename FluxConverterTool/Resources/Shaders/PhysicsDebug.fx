@@ -26,7 +26,7 @@ DepthStencilState EnableDepth
 VS_OUTPUT VS(VS_INPUT input)
 {
 	VS_OUTPUT output;
-	output.pos = mul ( float4(input.pos,1.0f), gWorldViewProj );
+	output.pos = mul ( float4(input.pos, 1.0f), gWorldViewProj );
 	return output;
 }
 

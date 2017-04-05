@@ -4,7 +4,7 @@ using SharpDX;
 
 namespace FluxConverterTool.Helpers
 {
-    public static class BinaryReaderExtensions
+    public static class BinaryWriterExtensions
     {
         public static void Write(this BinaryWriter writer, Vector3D v)
         {
