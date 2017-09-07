@@ -7,8 +7,6 @@ using Assimp;
 using FluxConverterTool.Helpers;
 using FluxConverterTool.ViewModels;
 using FluxConverterTool.Views;
-using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
 using PhysxNet;
 using SharpDX;
 using System;
@@ -99,10 +97,6 @@ namespace FluxConverterTool.Models
             ExportingDialogViewModel viewModel = new ExportingDialogViewModel();
             ExportingDialog exportingDialog = new ExportingDialog();
             exportingDialog.DataContext = viewModel;
-            exportingDialog.ShowCloseButton = false;
-            exportingDialog.ShowMaxRestoreButton = false;
-            exportingDialog.ShowMinButton = false;
-            exportingDialog.ShowDialogsOverTitleBar = true;
             exportingDialog.ShowInTaskbar = false;
             exportingDialog.Show();
 
@@ -110,8 +104,6 @@ namespace FluxConverterTool.Models
             worker.RunWorkerCompleted += (sender, args) =>
             {
                 exportingDialog.Close();
-                if (count > 1)
-                    ((MetroWindow)Application.Current.MainWindow).ShowMessageAsync("Export", $"Exported {count} mesh(es) successfully");
                 DebugLog.Log($"Exported {count} meshes", "Mesh Formatter");
             };
             worker.RunWorkerAsync(request);
@@ -252,7 +244,7 @@ namespace FluxConverterTool.Models
 
         public void LoadConvexMeshData(ref FluxMesh mesh)
         {
-            mesh.ConvexMesh = Cooking.CreateConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+            mesh.ConvexMesh = Cooking.CreateConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices()));
             DebugLog.Log($"Cooked convex mesh for {mesh.Name}", "Mesh Formatter");
         }
 

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "TriangleMeshDesc.h"
-#include "Math.h"
 
 namespace PhysxNet
 {
@@ -15,27 +14,27 @@ namespace PhysxNet
 		
 	}
 
-	physx::PxTriangleMeshDesc TriangleMeshDesc::ToUnmanaged()
+	physx::PxTriangleMeshDesc TriangleMeshDesc::Unmanaged()
 	{
 		if (Vertices->Length == 0 || Indices->Length == 0)
-			return physx::PxTriangleMeshDesc();
+			throw gcnew System::Exception("No vertices or indices!");
 
-		physx::PxTriangleMeshDesc desc;
-		desc.setToDefault();
-		desc.points.count = Vertices->Length;
+		physx::PxTriangleMeshDesc triangleMeshDesc;
+		triangleMeshDesc.setToDefault();
 
+		triangleMeshDesc.points.count = Vertices->Length;
 		pin_ptr<float> vertexPtr = &(Vertices[0].X);
-		desc.points.data = vertexPtr;
-		desc.points.stride = 3 * sizeof(float);
+		triangleMeshDesc.points.data = vertexPtr;
+		triangleMeshDesc.points.stride = 3 * sizeof(float);
 
-		desc.triangles.count = Indices->Length / 3;
+		triangleMeshDesc.triangles.count = Indices->Length / 3;
 		pin_ptr<int> indexPtr = &(Indices[0]);
-		desc.triangles.data = indexPtr;
-		desc.triangles.stride = sizeof(int) * 3;
+		triangleMeshDesc.triangles.data = indexPtr;
+		triangleMeshDesc.triangles.stride = sizeof(int) * 3;
 
-		if (desc.isValid() == false)
+		if (triangleMeshDesc.isValid() == false)
 			throw gcnew System::Exception("Triangle Mesh Description is invalid!");
 
-		return desc;
+		return triangleMeshDesc;
 	}
 }

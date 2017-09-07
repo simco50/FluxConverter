@@ -13,7 +13,7 @@ namespace PhysxNet
 	{
 	}
 
-	physx::PxTolerancesScale ToleranceScale::ToUnmanaged()
+	physx::PxTolerancesScale ToleranceScale::Unmanaged()
 	{
 		physx::PxTolerancesScale scale;
 		scale.length = Length;
@@ -24,6 +24,6 @@ namespace PhysxNet
 
 	bool ToleranceScale::IsValid()
 	{
-		return ToUnmanaged().isValid();
+		return Unmanaged().isValid();
 	}
 }

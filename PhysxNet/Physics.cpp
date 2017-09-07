@@ -5,16 +5,17 @@
 
 namespace PhysxNet
 {
-	Physics::Physics(Foundation^ pFoundation):
-		Physics::Physics(pFoundation, gcnew ToleranceScale())
+	Physics::Physics(Foundation^ Foundation):
+		Physics::Physics(Foundation, gcnew ToleranceScale())
 	{
 	
 	}
 
-	Physics::Physics(Foundation^ pFoundation, ToleranceScale^ pToleranceScale):
-		m_pFoundation(pFoundation)
+	Physics::Physics(Foundation^ Foundation, ToleranceScale^ ToleranceScale):
+		m_pFoundation(Foundation)
 	{
-		m_pPhysicsUnmanaged = PxCreatePhysics(PX_PHYSICS_VERSION, *pFoundation->GetUnmanaged(), pToleranceScale->ToUnmanaged());
+		m_pPhysicsUnmanaged = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation->Unmanaged(), ToleranceScale->Unmanaged());
+
 		if (m_pPhysicsUnmanaged == nullptr)
 			throw gcnew System::Exception("Failed to create physics!");
 	}

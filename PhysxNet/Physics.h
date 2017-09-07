@@ -8,11 +8,11 @@ namespace PhysxNet
 	public ref class Physics
 	{
 	public:
-		Physics(Foundation^ pFoundation);
-		Physics(Foundation^ pFoundation, ToleranceScale^ pToleranceScale);
+		Physics(Foundation^ Foundation);
+		Physics(Foundation^ Foundation, ToleranceScale^ ToleranceScale);
 		void Release();
 
-		physx::PxPhysics* GetUnmanaged() { return m_pPhysicsUnmanaged; }
+		physx::PxPhysics* Unmanaged() { return m_pPhysicsUnmanaged; }
 
 	private:
 		physx::PxPhysics* m_pPhysicsUnmanaged = nullptr;

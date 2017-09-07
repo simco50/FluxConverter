@@ -1,11 +1,9 @@
-﻿using MahApps.Metro.Controls;
-
-namespace FluxConverterTool.Views
+﻿namespace FluxConverterTool.Views
 {
     /// <summary>
     /// Interaction logic for DebugLogView.xaml
     /// </summary>
-    public partial class DebugLogView : MetroWindow
+    public partial class DebugLogView
     {
         public DebugLogView()
         {

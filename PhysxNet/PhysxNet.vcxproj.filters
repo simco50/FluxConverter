@@ -17,6 +17,9 @@
     <Filter Include="Cooking">
       <UniqueIdentifier>{b0d50b19-8656-4882-b47f-efa9277d8ffb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{807994db-62f6-4bb8-a562-2bacc6208bfd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
@@ -33,9 +36,6 @@
     <ClInclude Include="TriangleMeshDesc.h">
       <Filter>CookingParams</Filter>
     </ClInclude>
-    <ClInclude Include="Math.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="ConvexMeshDesc.h">
       <Filter>CookingParams</Filter>
     </ClInclude>
@@ -50,6 +50,9 @@
     </ClInclude>
     <ClInclude Include="CookingParams.h">
       <Filter>CookingParams</Filter>
+    </ClInclude>
+    <ClInclude Include="PxVec3.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

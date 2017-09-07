@@ -1,11 +1,9 @@
-﻿using MahApps.Metro.Controls;
-
-namespace FluxConverterTool.Views
+﻿namespace FluxConverterTool.Views
 {
     /// <summary>
     /// Interaction logic for HelpWindowView.xaml
     /// </summary>
-    public partial class HelpWindowView : MetroWindow
+    public partial class HelpWindowView
     {
         public HelpWindowView()
         {

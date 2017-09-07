@@ -3,7 +3,6 @@
 
 namespace PhysxNet
 {
-
 	Foundation::Foundation()
 	{
 		m_pDefaultAllocatorUnmanaged = new physx::PxDefaultAllocator();

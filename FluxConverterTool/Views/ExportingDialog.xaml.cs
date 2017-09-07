@@ -1,11 +1,9 @@
-﻿using MahApps.Metro.Controls;
-
-namespace FluxConverterTool.Views
+﻿namespace FluxConverterTool.Views
 {
     /// <summary>
     /// Interaction logic for ExportingDialog.xaml
     /// </summary>
-    public partial class ExportingDialog : MetroWindow
+    public partial class ExportingDialog
     {
         public ExportingDialog()
         {

@@ -18,7 +18,7 @@ namespace PhysxNet
 
 	physx::PxCookingParams PhysxNet::CookingParams::ToUnmanaged()
 	{
-		physx::PxCookingParams params(m_pToleranceScale->ToUnmanaged());
+		physx::PxCookingParams params(m_pToleranceScale->Unmanaged());
 		params.convexMeshCookingType = physx::PxConvexMeshCookingType::eQUICKHULL;
 		params.meshPreprocessParams = static_cast<physx::PxMeshPreprocessingFlag::Enum>(MeshPreprocessingFlags);
 		params.meshWeldTolerance = MeshWeldTolerance;

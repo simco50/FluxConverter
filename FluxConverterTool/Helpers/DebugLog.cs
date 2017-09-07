@@ -4,8 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
 
 namespace FluxConverterTool.Helpers
 {
@@ -85,11 +83,7 @@ namespace FluxConverterTool.Helpers
                     break;
                 case LogSeverity.InfoMessageBox:
                 case LogSeverity.Warning:
-                    MetroWindow window = Application.Current.MainWindow as MetroWindow;
-                    MetroDialogSettings settings = new MetroDialogSettings();
-                    settings.AnimateHide = false;
-                    settings.AnimateShow = false;
-                    window.ShowMessageAsync(source, what, MessageDialogStyle.Affirmative, settings);
+                    MessageBox.Show(what, source, MessageBoxButton.OK, MessageBoxImage.Warning);
                     break;
                 case LogSeverity.Error:
                     MessageBox.Show(what, source, MessageBoxButton.OK, MessageBoxImage.Error);

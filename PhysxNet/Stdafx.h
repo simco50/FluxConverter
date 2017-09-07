@@ -5,6 +5,7 @@
 #pragma once
 
 #include <PxPhysicsAPI.h>
+#include "PxVec3.h"
 
 #if defined(DEBUG) || defined(_DEBUG)
 #pragma comment(lib, "PhysX3DEBUG_x86.lib")
@@ -17,5 +18,3 @@
 #pragma comment(lib, "PhysX3Cooking_x86.lib")
 #pragma comment(lib, "PhysX3Extensions.lib")
 #endif
-
-#include "Math.h"

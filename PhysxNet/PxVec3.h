@@ -8,6 +8,8 @@ namespace PhysxNet
 		PxVec3(float x, float y, float z) :
 			X(x), Y(y), Z(z)
 		{}
-		float X, Y, Z;
+		float X;
+		float Y;
+		float Z;
 	};
 }

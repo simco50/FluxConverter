@@ -7,7 +7,7 @@ namespace PhysxNet
 		ToleranceScale();
 		ToleranceScale(float length, float mass, float speed);
 
-		physx::PxTolerancesScale ToUnmanaged();
+		physx::PxTolerancesScale Unmanaged();
 
 		bool IsValid();
 

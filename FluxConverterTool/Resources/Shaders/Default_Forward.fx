@@ -1,6 +1,7 @@
 float4x4 gWorld : WORLD;
 float4x4 gWorldViewProj : WORLDVIEWPROJECTION; 
 float3 gLightDirection = float3(-0.577f, -0.577f, 0.577f);
+float gUniformScale = 0.0f;
 
 bool gUseDiffuseTexture = false;
 texture2D gDiffuseTexture;
@@ -39,7 +40,7 @@ SamplerState samLinear
 VS_OUTPUT VS(VS_INPUT input)
 {
 	VS_OUTPUT output;
-	output.pos = mul ( float4(input.pos,1.0f), gWorldViewProj );
+	output.pos = mul ( float4(input.pos,1.0f), gWorldViewProj ) * gUniformScale;
 	output.uv = input.uv;
 	output.normal = normalize(mul(input.normal, (float3x3)gWorld));
 	output.tangent = normalize(mul(input.tangent, (float3x3)gWorld));

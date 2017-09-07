@@ -1,8 +1,8 @@
 #include "stdafx.h"
+
 #include "Cooking.h"
 #include "Foundation.h"
 #include "TriangleMeshDesc.h"
-#include "Math.h"
 #include "ConvexMeshDesc.h"
 #include "ToleranceScale.h"
 #include "Physics.h"
@@ -27,7 +27,8 @@ namespace PhysxNet
 		params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eWELD_VERTICES;
 		params.convexMeshCookingType = physx::PxConvexMeshCookingType::eQUICKHULL;
 		params.meshWeldTolerance = 0.05f;
-		m_pCookingUnmanaged = PxCreateCooking(PX_PHYSICS_VERSION, *pFoundation->GetUnmanaged(), params);
+
+		m_pCookingUnmanaged = PxCreateCooking(PX_PHYSICS_VERSION, *pFoundation->Unmanaged(), params);
 		if (m_pCookingUnmanaged == nullptr)
 			throw gcnew System::Exception("Failed to create cooking!");
 	}
@@ -43,21 +44,20 @@ namespace PhysxNet
 
 	PhysicsMesh^ Cooking::CreateConvexMesh(ConvexMeshDesc^ desc)
 	{
-		physx::PxConvexMeshDesc convexDesc = desc->ToUnmanaged();
+		physx::PxConvexMeshDesc convexDesc = desc->Unmanaged();
 
 		PhysicsOutputStream outputStream;
 		m_pCookingUnmanaged->cookConvexMesh(convexDesc, outputStream);
-		if (outputStream.GetBuffer().size() == 0)
+		if (outputStream.GetCount() == 0)
 			return nullptr;
 
 		PhysicsMesh^ pOutputMesh = gcnew PhysicsMesh();
-		std::vector<char> dataBuffer = outputStream.GetBuffer();
-		pOutputMesh->MeshData->Capacity = dataBuffer.size();
-		for (size_t i = 0; i < dataBuffer.size(); i++)
-			pOutputMesh->MeshData->Add(dataBuffer[i]);
+		pOutputMesh->MeshData->Capacity = outputStream.GetCount();
+		for (int i = 0; i < pOutputMesh->MeshData->Capacity; i++)
+			pOutputMesh->MeshData->Add(outputStream.Data()[i]);
 
-		PhysicsInputStream inputStream(dataBuffer);
-		physx::PxConvexMesh* pConvexMesh = m_pPhysics->GetUnmanaged()->createConvexMesh(inputStream);
+		PhysicsInputStream inputStream(outputStream.Data(), outputStream.GetCount());
+		physx::PxConvexMesh* pConvexMesh = m_pPhysics->Unmanaged()->createConvexMesh(inputStream);
 		if (pConvexMesh == nullptr)
 			return nullptr;
 
@@ -94,21 +94,20 @@ namespace PhysxNet
 
 	PhysicsMesh^ Cooking::CreateTriangleMesh(TriangleMeshDesc^ desc)
 	{
-		physx::PxTriangleMeshDesc triangleDesc = desc->ToUnmanaged();
+		physx::PxTriangleMeshDesc triangleDesc = desc->Unmanaged();
 
 		PhysicsOutputStream outputStream;
 		m_pCookingUnmanaged->cookTriangleMesh(triangleDesc, outputStream);
-		if (outputStream.GetBuffer().size() == 0)
+		if (outputStream.GetCount() == 0)
 			return nullptr;
 
 		PhysicsMesh^ pOutputMesh = gcnew PhysicsMesh();
-		std::vector<char> dataBuffer = outputStream.GetBuffer();
-		pOutputMesh->MeshData->Capacity = dataBuffer.size();
-		for (size_t i = 0; i < dataBuffer.size(); i++)
-			pOutputMesh->MeshData->Add(dataBuffer[i]);
+		pOutputMesh->MeshData->Capacity = outputStream.GetCount();
+		for (int i = 0; i < pOutputMesh->MeshData->Capacity; i++)
+			pOutputMesh->MeshData->Add(outputStream.Data()[i]);
 
-		PhysicsInputStream inputStream(dataBuffer);
-		physx::PxTriangleMesh* pTriangleMesh = m_pPhysics->GetUnmanaged()->createTriangleMesh(inputStream);
+		PhysicsInputStream inputStream(outputStream.Data(), outputStream.GetCount());
+		physx::PxTriangleMesh* pTriangleMesh = m_pPhysics->Unmanaged()->createTriangleMesh(inputStream);
 		if (pTriangleMesh == nullptr)
 			return nullptr;
 

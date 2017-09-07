@@ -1,4 +1,4 @@
-﻿<controls:MetroWindow
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,23 +6,24 @@
         xmlns:viewModels="clr-namespace:FluxConverterTool.ViewModels"
         xmlns:views="clr-namespace:FluxConverterTool.Views"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
+        xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         x:Class="FluxConverterTool.Views.MainView"
         mc:Ignorable="d"
         Title="Flux Converter" Height="720" Width="1240" Icon="/FluxConverterTool;component/Logo.ico">
 
-    <controls:MetroWindow.InputBindings>
+    <Window.InputBindings>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveSelectedMeshCommand}"/>
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding ImportMeshCommand}"/>
         <KeyBinding Key="F1" Command="{Binding ShowHelpWindowCommand}"/>
         <KeyBinding Key="F2" Command="{Binding ShowDebugLogCommand}"/>
         <KeyBinding Key="Delete" Command="{Binding RemoveSelectedCommand}"/>
-    </controls:MetroWindow.InputBindings>
+    </Window.InputBindings>
     
-    <controls:MetroWindow.DataContext>
+    <Window.DataContext>
         <viewModels:MainViewModel/>
-    </controls:MetroWindow.DataContext>
+    </Window.DataContext>
 
     <Grid>
         <Grid>
@@ -194,7 +195,7 @@
                                             <Label Content="EXPORT ANIMATION"/>
                                         </StackPanel>
                                         <Label Content="Speed"/>
-                                        <controls:NumericUpDown Value="1" Minimum="0.01" Maximum="10.0"/>
+                                        <Slider Value="1" Minimum="0.01" Maximum="10.0"/>
                                     </StackPanel>
                                 </Grid>
                                 <Grid Grid.Row="1">
@@ -214,5 +215,5 @@
             </Grid>
         </Grid>
     </Grid>
-</controls:MetroWindow>
+</Window>
 

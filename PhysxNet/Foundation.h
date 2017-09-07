@@ -7,7 +7,7 @@ namespace PhysxNet
 		Foundation();
 		void Release();
 
-		physx::PxFoundation* GetUnmanaged() { return m_pFoundationUnmanaged; }
+		physx::PxFoundation* Unmanaged() { return m_pFoundationUnmanaged; }
 
 	private:
 		physx::PxFoundation* m_pFoundationUnmanaged = nullptr;

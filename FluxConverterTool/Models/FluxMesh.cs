@@ -6,6 +6,12 @@ using SharpDX.Direct3D10;
 
 namespace FluxConverterTool.Models
 {
+    public class VertexBoneData
+    {
+        public uint[] IDs = new uint[4];
+        public float[] Weights = new float[4];
+    }
+
     public class FluxMesh : ObservableObject
     {
         #region DATA
@@ -16,6 +22,9 @@ namespace FluxConverterTool.Models
         public List<Vector3D> Tangents { get; set; } = new List<Vector3D>();
         public List<Vector2D> TexCoords { get; set; } = new List<Vector2D>();
         public List<Color4D> VertexColors { get; set; } = new List<Color4D>();
+
+        public List<Matrix4x4> BoneTransforms { get; set; } = new List<Matrix4x4>();
+        public List<VertexBoneData> VertexWeights { get; set; } = new List<VertexBoneData>();
 
         public PhysicsMesh ConvexMesh { get; set; } = null;
         public PhysicsMesh TriangleMesh { get; set; } = null;
