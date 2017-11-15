@@ -1,7 +1,7 @@
 float4x4 gWorld : WORLD;
 float4x4 gWorldViewProj : WORLDVIEWPROJECTION; 
 float3 gLightDirection = float3(-0.577f, -0.577f, 0.577f);
-float gUniformScale = 0.0f;
+float gUniformScale = 1.0f;
 
 bool gUseDiffuseTexture = false;
 texture2D gDiffuseTexture;

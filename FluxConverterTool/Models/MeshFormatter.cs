@@ -17,8 +17,8 @@ namespace FluxConverterTool.Models
 {
     public enum FLUX_VERSION : byte
     {
-        MIN = 5,
-        MAX = 5,
+        MIN = 7,
+        MAX = 7,
     }
 
     public class MeshConvertRequest
@@ -51,35 +51,102 @@ namespace FluxConverterTool.Models
             DebugLog.Log("Shutdown", "Mesh Formatter");
         }
 
+        private BoundingBox GetBoundingBox(Scene scene)
+        {
+            SharpDX.BoundingBox box = new SharpDX.BoundingBox();
+            if (scene.HasMeshes)
+            {
+                foreach (Mesh mesh in scene.Meshes)
+                {
+                    SharpDX.BoundingBox meshBox = GetBoundingBox(mesh);
+                    box.Minimum.X = Math.Min(box.Minimum.X, meshBox.Minimum.X);
+                    box.Minimum.Y = Math.Min(box.Minimum.Y, meshBox.Minimum.Y);
+                    box.Minimum.Z = Math.Min(box.Minimum.Z, meshBox.Minimum.Z);
+
+                    box.Maximum.X = Math.Max(box.Maximum.X, meshBox.Maximum.X);
+                    box.Maximum.Y = Math.Max(box.Maximum.Y, meshBox.Maximum.Y);
+                    box.Maximum.Z = Math.Max(box.Maximum.Z, meshBox.Maximum.Z);
+                }
+            }
+
+            BoundingBox newBox = new BoundingBox();
+            newBox.Center.X = (box.Minimum.X + box.Maximum.X) / 2.0f;
+            newBox.Center.Y = (box.Minimum.Y + box.Maximum.Y) / 2.0f;
+            newBox.Center.Z = (box.Minimum.Z + box.Maximum.Z) / 2.0f;
+            newBox.Extents.X = Math.Abs(box.Maximum.X - newBox.Center.X);
+            newBox.Extents.Y = Math.Abs(box.Maximum.Y - newBox.Center.Y);
+            newBox.Extents.Z = Math.Abs(box.Maximum.Z - newBox.Center.Z);
+
+            return newBox;
+        }
+
+        private SharpDX.BoundingBox GetBoundingBox(Mesh sceneMesh)
+        {
+            SharpDX.BoundingBox box = new SharpDX.BoundingBox();
+            if (sceneMesh.HasVertices)
+            {
+                foreach (Vector3D v in sceneMesh.Vertices)
+                {
+                    box.Minimum.X = Math.Min(v.X, box.Minimum.X);
+                    box.Minimum.Y = Math.Min(v.Y, box.Minimum.Y);
+                    box.Minimum.Z = Math.Min(v.Z, box.Minimum.Z);
+
+                    box.Maximum.X = Math.Max(v.X, box.Maximum.X);
+                    box.Maximum.Y = Math.Max(v.Y, box.Maximum.Y);
+                    box.Maximum.Z = Math.Max(v.Z, box.Maximum.Z);
+                }
+            }
+            return box;
+        }
+
         public FluxMesh LoadMesh(string filePath)
         {
             FluxMesh mesh = new FluxMesh();
             mesh.Name = Path.GetFileNameWithoutExtension(filePath);
             AssimpContext context = new AssimpContext();
-            Scene scene = context.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.CalculateTangentSpace | PostProcessSteps.FlipUVs);
+            Scene scene = context.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.CalculateTangentSpace | PostProcessSteps.FlipUVs | PostProcessSteps.GenerateSmoothNormals);
+            var mats = scene.Materials;
 
-            Mesh m = scene.Meshes[0];
+            mesh.BoundingBox = GetBoundingBox(scene);
 
-            for (int i = 0; i < m.VertexCount; i++)
+            foreach (Mesh sceneMesh in scene.Meshes)
             {
-                if (m.HasVertices)
-                    mesh.Positions.Add(m.Vertices[i]);
-                if (m.HasNormals)
-                    mesh.Normals.Add(m.Normals[i]);
-                if (m.HasTangentBasis)
-                    mesh.Tangents.Add(m.Tangents[i]);
-                if (m.HasTextureCoords(0))
+                SubMesh subMesh = new SubMesh();
+                subMesh.MaterialID = sceneMesh.MaterialIndex;
+
+                for (int i = 0; i < sceneMesh.VertexCount; i++)
                 {
-                    Vector3D texCoord = m.TextureCoordinateChannels[0][i];
-                    mesh.TexCoords.Add(new Vector2D(texCoord.X, texCoord.Y));
+                    if (sceneMesh.HasVertices)
+                        subMesh.Positions.Add(sceneMesh.Vertices[i]);
+                    if (sceneMesh.HasNormals)
+                        subMesh.Normals.Add(sceneMesh.Normals[i]);
+                    if (sceneMesh.HasTangentBasis)
+                        subMesh.Tangents.Add(sceneMesh.Tangents[i]);
+                    if (sceneMesh.HasTextureCoords(0))
+                    {
+                        Vector3D texCoord = sceneMesh.TextureCoordinateChannels[0][i];
+                        subMesh.TexCoords.Add(new Vector2D(texCoord.X, texCoord.Y));
+                    }
+                    if (sceneMesh.HasVertexColors(0))
+                        subMesh.VertexColors.Add(sceneMesh.VertexColorChannels[0][i]);
                 }
-                if (m.HasVertexColors(0))
-                    mesh.VertexColors.Add(m.VertexColorChannels[0][i]);
-            }
-            if (m.HasFaces)
-            {
-                foreach (int index in m.GetIndices())
-                    mesh.Indices.Add(index);
+                if (sceneMesh.HasFaces)
+                {
+                    foreach (int index in sceneMesh.GetIndices())
+                        subMesh.Indices.Add(index);
+                }
+
+                bool merged = false;
+                foreach (SubMesh subM in mesh.Meshes)
+                {
+                    if (subM.TryMerge(subMesh))
+                    {
+                        merged = true;
+                        break;
+                    }
+                }
+                if(merged == false)
+                    mesh.Meshes.Add(subMesh);
             }
 
             DebugLog.Log($"Imported mesh '{mesh.Name}'", "Mesh Formatter");
@@ -163,60 +230,72 @@ namespace FluxConverterTool.Models
             writer.Write((char)FLUX_VERSION.MIN);
             writer.Write((char)FLUX_VERSION.MAX);
 
-            if (mesh.WriteIndices)
-            {
-                writer.Write("INDEX");
-                writer.Write(mesh.Indices.Count);
-                writer.Write(sizeof(int));
-                foreach (uint index in mesh.Indices)
-                    writer.Write(index);
-            }
+            writer.Write((float)mesh.BoundingBox.Center.X);
+            writer.Write((float)mesh.BoundingBox.Center.Y);
+            writer.Write((float)mesh.BoundingBox.Center.Z);
+            writer.Write((float)mesh.BoundingBox.Extents.X);
+            writer.Write((float)mesh.BoundingBox.Extents.Y);
+            writer.Write((float)mesh.BoundingBox.Extents.Z);
 
-            if (mesh.WritePositions)
-            {
-                writer.Write("POSITION");
-                writer.Write(mesh.Positions.Count);
-                writer.Write(Marshal.SizeOf(typeof(Vector3D)));
-                foreach (Vector3D v in mesh.Positions)
-                    writer.Write(v);
-            }
+            writer.Write((int)mesh.Meshes.Count);
 
-            if (mesh.WriteNormals)
+            foreach (SubMesh subMesh in mesh.Meshes)
             {
-                writer.Write("NORMAL");
-                writer.Write(mesh.Normals.Count);
-                writer.Write(Marshal.SizeOf(typeof(Vector3D)));
-                foreach (Vector3D v in mesh.Normals)
-                    writer.Write(v);
-            }
+                if (mesh.WriteIndices)
+                {
+                    writer.Write("INDEX");
+                    writer.Write(subMesh.Indices.Count);
+                    writer.Write(sizeof(int));
+                    foreach (uint index in subMesh.Indices)
+                        writer.Write(index);
+                }
 
-            if (mesh.WriteTangents)
-            {
-                writer.Write("TANGENT");
-                writer.Write(mesh.Tangents.Count);
-                writer.Write(Marshal.SizeOf(typeof(Vector3D)));
-                foreach (Vector3D v in mesh.Tangents)
-                    writer.Write(v);
-            }
+                if (mesh.WritePositions)
+                {
+                    writer.Write("POSITION");
+                    writer.Write(subMesh.Positions.Count);
+                    writer.Write(Marshal.SizeOf(typeof(Vector3D)));
+                    foreach (Vector3D v in subMesh.Positions)
+                        writer.Write(v);
+                }
 
-            if (mesh.WriteColors)
-            {
-                writer.Write("COLOR");
-                writer.Write(mesh.VertexColors.Count);
-                writer.Write(Marshal.SizeOf(typeof(Color4D)));
-                foreach (Color4D c in mesh.VertexColors)
-                    writer.Write(c);
-            }
+                if (mesh.WriteNormals)
+                {
+                    writer.Write("NORMAL");
+                    writer.Write(subMesh.Normals.Count);
+                    writer.Write(Marshal.SizeOf(typeof(Vector3D)));
+                    foreach (Vector3D v in subMesh.Normals)
+                        writer.Write(v);
+                }
 
-            if (mesh.WriteTexcoords)
-            {
-                writer.Write("TEXCOORD");
-                writer.Write(mesh.TexCoords.Count);
-                writer.Write(Marshal.SizeOf(typeof(Vector2D)));
-                foreach (Vector2D v in mesh.TexCoords)
-                    writer.Write(v);
+                if (mesh.WriteTangents)
+                {
+                    writer.Write("TANGENT");
+                    writer.Write(subMesh.Tangents.Count);
+                    writer.Write(Marshal.SizeOf(typeof(Vector3D)));
+                    foreach (Vector3D v in subMesh.Tangents)
+                        writer.Write(v);
+                }
+
+                if (mesh.WriteColors)
+                {
+                    writer.Write("COLOR");
+                    writer.Write(subMesh.VertexColors.Count);
+                    writer.Write(Marshal.SizeOf(typeof(Color4D)));
+                    foreach (Color4D c in subMesh.VertexColors)
+                        writer.Write(c);
+                }
+
+                if (mesh.WriteTexcoords)
+                {
+                    writer.Write("TEXCOORD");
+                    writer.Write(subMesh.TexCoords.Count);
+                    writer.Write(Marshal.SizeOf(typeof(Vector2D)));
+                    foreach (Vector2D v in subMesh.TexCoords)
+                        writer.Write(v);
+                }
+                writer.Write("ENDMESH");
             }
-            writer.Write("END");
             return true;
         }
 
@@ -244,7 +323,10 @@ namespace FluxConverterTool.Models
 
         public void LoadConvexMeshData(ref FluxMesh mesh)
         {
-            mesh.ConvexMesh = Cooking.CreateConvexMesh(new ConvexMeshDesc(mesh.Positions.ToCookerVertices()));
+            List<PxVec3> CookVertices = new List<PxVec3>();
+            foreach(SubMesh subMesh in mesh.Meshes)
+                CookVertices.AddRange(subMesh.Positions.ToCookerVertices());
+            mesh.ConvexMesh = Cooking.CreateConvexMesh(new ConvexMeshDesc(CookVertices));
             DebugLog.Log($"Cooked convex mesh for {mesh.Name}", "Mesh Formatter");
         }
 
@@ -271,7 +353,17 @@ namespace FluxConverterTool.Models
 
         public void LoadTriangleMeshData(ref FluxMesh mesh)
         {
-            mesh.TriangleMesh = Cooking.CreateTriangleMesh(new TriangleMeshDesc(mesh.Positions.ToCookerVertices(), mesh.Indices));
+            List<PxVec3> CookVertices = new List<PxVec3>();
+            List<int> CookIndices = new List<int>();
+            int currentIndexOffset = 0;
+            foreach (SubMesh subMesh in mesh.Meshes)
+            {
+                CookVertices.AddRange(subMesh.Positions.ToCookerVertices());
+                foreach (int index in subMesh.Indices)
+                    CookIndices.Add(index + currentIndexOffset);
+                currentIndexOffset += subMesh.Positions.Count;
+            }
+            mesh.TriangleMesh = Cooking.CreateTriangleMesh(new TriangleMeshDesc(CookVertices, CookIndices));
             DebugLog.Log($"Cooked triangle mesh for {mesh.Name}", "Mesh Formatter");
         }
     }

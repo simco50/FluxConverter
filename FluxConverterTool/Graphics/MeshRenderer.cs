@@ -21,11 +21,77 @@ namespace FluxConverterTool.Graphics
         public Vector3D Tangent;
     }
 
-    public class MeshRenderer
+    public class Model
     {
+        public Model(SubMesh mesh)
+        {
+            _subMesh = mesh;
+        }
+        private SubMesh _subMesh;
+
+        public void CreateBuffers(GraphicsContext context)
+        {
+            Dispose();
+
+             BufferDescription desc = new BufferDescription();
+            desc.SizeInBytes = sizeof(uint) * _subMesh.Indices.Count;
+            desc.BindFlags = BindFlags.IndexBuffer;
+            desc.OptionFlags = ResourceOptionFlags.None;
+            desc.Usage = ResourceUsage.Default;
+            desc.CpuAccessFlags = CpuAccessFlags.None;
+            DataStream stream = DataStream.Create(_subMesh.Indices.ToArray(), false, false);
+            _indexBuffer = new Buffer(context.Device, stream, desc);
+
+            desc = new BufferDescription();
+            desc.SizeInBytes = Marshal.SizeOf(typeof(VertexPosNormTanTex)) * _subMesh.Positions.Count;
+            desc.BindFlags = BindFlags.VertexBuffer;
+            desc.OptionFlags = ResourceOptionFlags.None;
+            desc.Usage = ResourceUsage.Default;
+            desc.CpuAccessFlags = CpuAccessFlags.None;
+
+            VertexPosNormTanTex[] vertices = new VertexPosNormTanTex[_subMesh.Positions.Count];
+            for (int i = 0; i < _subMesh.Positions.Count; i++)
+            {
+                if (i < _subMesh.Positions.Count)
+                    vertices[i].Position = _subMesh.Positions[i];
+                if (i < _subMesh.Normals.Count)
+                    vertices[i].Normal = _subMesh.Normals[i];
+                if (i < _subMesh.TexCoords.Count)
+                    vertices[i].TexCoord = _subMesh.TexCoords[i];
+                if (i < _subMesh.Tangents.Count)
+                    vertices[i].Tangent = _subMesh.Tangents[i];
+            }
+
+            stream = DataStream.Create(vertices, false, false);
+            _vertexBuffer = new Buffer(context.Device, stream, desc);
+        }
+
+        public void Render(GraphicsContext context)
+        {
+            context.Device.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R32_UInt, 0);
+            context.Device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNormTanTex)), 0));
+            if (_subMesh.Indices.Count > 0)
+                context.Device.DrawIndexed(_subMesh.Indices.Count, 0, 0);
+            else
+                context.Device.Draw(_subMesh.Positions.Count, 0);
+        }
+
+        public void Dispose()
+        {
+            if (_vertexBuffer != null)
+                Disposer.RemoveAndDispose(ref _vertexBuffer);
+            if (_indexBuffer != null)
+                Disposer.RemoveAndDispose(ref _indexBuffer);
+        }
+
         private Buffer _indexBuffer;
         private Buffer _vertexBuffer;
+    }
+
+    public class MeshRenderer
+    {
         private FluxMesh _mesh;
+        private List<Model> _models = new List<Model>();
         private GraphicsContext _context;
         private Material _defaultMaterial;
 
@@ -74,10 +140,9 @@ namespace FluxConverterTool.Graphics
 
         public void Shutdown()
         {
-            if (_vertexBuffer != null)
-                Disposer.RemoveAndDispose(ref _vertexBuffer);
-            if (_indexBuffer != null)
-                Disposer.RemoveAndDispose(ref _indexBuffer);
+            foreach (Model model in _models)
+                model.Dispose();
+            _models.Clear();
 
             _defaultMaterial.Shutdown();
 
@@ -86,42 +151,16 @@ namespace FluxConverterTool.Graphics
 
         void CreateBuffers()
         {
-            if (_vertexBuffer != null)
-                Disposer.RemoveAndDispose(ref _vertexBuffer);
-            if (_indexBuffer != null)
-                Disposer.RemoveAndDispose(ref _indexBuffer);
+            foreach (Model model in _models)
+                model.Dispose();
+            _models.Clear();
 
-            BufferDescription desc = new BufferDescription();
-            desc.SizeInBytes = sizeof(uint) * _mesh.Indices.Count;
-            desc.BindFlags = BindFlags.IndexBuffer;
-            desc.OptionFlags = ResourceOptionFlags.None;
-            desc.Usage = ResourceUsage.Default;
-            desc.CpuAccessFlags = CpuAccessFlags.None;
-            DataStream stream = DataStream.Create(_mesh.Indices.ToArray(), false, false);
-            _indexBuffer = new Buffer(_context.Device, stream, desc);
-
-            desc = new BufferDescription();
-            desc.SizeInBytes = Marshal.SizeOf(typeof(VertexPosNormTanTex)) * _mesh.Positions.Count;
-            desc.BindFlags = BindFlags.VertexBuffer;
-            desc.OptionFlags = ResourceOptionFlags.None;
-            desc.Usage = ResourceUsage.Default;
-            desc.CpuAccessFlags = CpuAccessFlags.None;
-
-            VertexPosNormTanTex[] vertices = new VertexPosNormTanTex[_mesh.Positions.Count];
-            for (int i = 0; i < _mesh.Positions.Count; i++)
+            foreach (SubMesh subMesh in _mesh.Meshes)
             {
-                if(i < _mesh.Positions.Count)
-                    vertices[i].Position = _mesh.Positions[i];
-                if(i < _mesh.Normals.Count)
-                    vertices[i].Normal = _mesh.Normals[i];
-                if(i < _mesh.TexCoords.Count)
-                    vertices[i].TexCoord = _mesh.TexCoords[i];
-                if(i < _mesh.Tangents.Count)
-                    vertices[i].Tangent = _mesh.Tangents[i];
+                Model model = new Model(subMesh);
+                model.CreateBuffers(_context);
+                _models.Add(model);
             }
-
-            stream = DataStream.Create(vertices, false, false);
-            _vertexBuffer = new Buffer(_context.Device, stream, desc);
 
             DebugLog.Log($"Buffers initialized for mesh '{_mesh.Name}'", "Mesh Renderer");
         }
@@ -132,8 +171,6 @@ namespace FluxConverterTool.Graphics
                 return;
 
             _context.Device.InputAssembler.InputLayout = _defaultMaterial.InputLayout;
-            _context.Device.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R32_UInt, 0);
-            _context.Device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, Marshal.SizeOf(typeof(VertexPosNormTanTex)), 0));
             _context.Device.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
             _defaultMaterial.UpdateShaderVariables(_mesh);
@@ -142,7 +179,11 @@ namespace FluxConverterTool.Graphics
             for (int i = 0; i < desc.PassCount; i++)
             {
                 _defaultMaterial.Technique.GetPassByIndex(i).Apply();
-                _context.Device.DrawIndexed(_mesh.Indices.Count, 0, 0);
+
+                foreach (Model model in _models)
+                {
+                    model.Render(_context);
+                }
             }
         }
     }
