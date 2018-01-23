@@ -185,7 +185,7 @@ namespace FluxConverterTool.Models
             if (request == null) return;
 
             int meshCount = request.MeshQueue.Count;
-            const int stageCount = 3;
+            const int stageCount = 4;
             int progressIncrement = 100 / meshCount / stageCount;
             int progress = 0;
             for (int i = 0; i < meshCount; i++)
@@ -199,25 +199,23 @@ namespace FluxConverterTool.Models
                 WriteMesh(mesh, stream);
                 progress += progressIncrement;
                 stream.Close();
-                if (mesh.CookConvexMesh || mesh.CookTriangleMesh)
+                if (mesh.CookConvexMesh) 
                 {
-                    stream = File.Create($"{filePath}.collision");
-                    if (mesh.CookConvexMesh)
-                    {
-                        worker.ReportProgress(progress, $"'{mesh.Name}' Cooking convex mesh...");
-                        WriteConvexMeshData(mesh, stream);
-                    }
+                    stream = File.Create($"{filePath}_convex.collision");
+                    worker.ReportProgress(progress, $"'{mesh.Name}' Cooking convex mesh...");
+					WriteConvexMeshData(mesh, stream);
                     progress += progressIncrement;
-
-                    if (mesh.CookTriangleMesh)
-                    {
-                        worker.ReportProgress(progress, $"'{mesh.Name}' Cooking triangle mesh...");
-                        WriteTriangleMeshData(mesh, stream);
-                    }
                     stream.Close();
                 }
-                progress += progressIncrement;
+				if (mesh.CookTriangleMesh)
+				{
+					stream = File.Create($"{filePath}_triangle.collision");
+					worker.ReportProgress(progress, $"'{mesh.Name}' Cooking triangle mesh...");
+					WriteTriangleMeshData(mesh, stream);
+					stream.Close();
+				}
 
+                progress += progressIncrement;
                 DebugLog.Log($"Exported {mesh.Name}", "Mesh Formatter");
             }
         }

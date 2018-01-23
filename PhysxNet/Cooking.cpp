@@ -61,7 +61,6 @@ namespace PhysxNet
 		if (pConvexMesh == nullptr)
 			return nullptr;
 
-		physx::PxU32 nbVerts = pConvexMesh->getNbVertices();
 		const physx::PxVec3* convexVerts = pConvexMesh->getVertices();
 		const physx::PxU8* indexBuffer = pConvexMesh->getIndexBuffer();
 		physx::PxU32 offset = 0;
@@ -69,6 +68,7 @@ namespace PhysxNet
 		{
 			physx::PxHullPolygon face;
 			bool status = pConvexMesh->getPolygonData(i, face);
+			status;
 			PX_ASSERT(status);
 
 			const physx::PxU8* faceIndices = indexBuffer + face.mIndexBase;
