@@ -1,5 +1,6 @@
 ﻿using Assimp;
 using SharpDX;
+using System.Collections.Generic;
 
 namespace FluxConverterTool.Helpers
 {
@@ -17,5 +18,13 @@ namespace FluxConverterTool.Helpers
         {
             return new Color(other.R, other.G, other.G, other.A);
         }
+
+		public static List<Vector2D> ToTexCoord(this List<Vector3D> other)
+		{
+			List<Vector2D> output = new List<Vector2D>();
+			foreach (Vector3D v in other)
+				output.Add(new Vector2D(v.X, v.Y));
+			return output;
+		}
     }
 }

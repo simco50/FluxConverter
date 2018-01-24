@@ -103,8 +103,15 @@ namespace FluxConverterTool.Models
         {
             FluxMesh mesh = new FluxMesh();
             mesh.Name = Path.GetFileNameWithoutExtension(filePath);
-            AssimpContext context = new AssimpContext();
-            Scene scene = context.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.CalculateTangentSpace | PostProcessSteps.FlipUVs | PostProcessSteps.GenerateSmoothNormals);
+			PostProcessSteps importFlags = 
+				PostProcessSteps.Triangulate 
+				| PostProcessSteps.JoinIdenticalVertices 
+				| PostProcessSteps.CalculateTangentSpace 
+				| PostProcessSteps.FlipUVs 
+				| PostProcessSteps.GenerateSmoothNormals;
+
+			AssimpContext context = new AssimpContext();
+            Scene scene = context.ImportFile(filePath, importFlags);
             var mats = scene.Materials;
 
             mesh.BoundingBox = GetBoundingBox(scene);
@@ -114,27 +121,18 @@ namespace FluxConverterTool.Models
                 SubMesh subMesh = new SubMesh();
                 subMesh.MaterialID = sceneMesh.MaterialIndex;
 
-                for (int i = 0; i < sceneMesh.VertexCount; i++)
-                {
-                    if (sceneMesh.HasVertices)
-                        subMesh.Positions.Add(sceneMesh.Vertices[i]);
-                    if (sceneMesh.HasNormals)
-                        subMesh.Normals.Add(sceneMesh.Normals[i]);
-                    if (sceneMesh.HasTangentBasis)
-                        subMesh.Tangents.Add(sceneMesh.Tangents[i]);
-                    if (sceneMesh.HasTextureCoords(0))
-                    {
-                        Vector3D texCoord = sceneMesh.TextureCoordinateChannels[0][i];
-                        subMesh.TexCoords.Add(new Vector2D(texCoord.X, texCoord.Y));
-                    }
-                    if (sceneMesh.HasVertexColors(0))
-                        subMesh.VertexColors.Add(sceneMesh.VertexColorChannels[0][i]);
-                }
+                if (sceneMesh.HasVertices)
+					subMesh.Positions = sceneMesh.Vertices;
+                if (sceneMesh.HasNormals)
+					subMesh.Normals = sceneMesh.Normals;
+                if (sceneMesh.HasTangentBasis)
+					subMesh.Tangents = sceneMesh.Tangents;
+                if (sceneMesh.HasVertexColors(0))
+					subMesh.VertexColors = sceneMesh.VertexColorChannels[0];
+				if (sceneMesh.HasTextureCoords(0))
+					subMesh.TexCoords = sceneMesh.TextureCoordinateChannels[0].ToTexCoord();
                 if (sceneMesh.HasFaces)
-                {
-                    foreach (int index in sceneMesh.GetIndices())
-                        subMesh.Indices.Add(index);
-                }
+					subMesh.Indices = new List<int>(sceneMesh.GetIndices());
 
                 bool merged = false;
                 foreach (SubMesh subM in mesh.Meshes)
